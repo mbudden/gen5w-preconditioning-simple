@@ -297,18 +297,18 @@ public final class MainActivity extends Activity {
         LinearLayout body = ui.column();
         advancedScroll.addView(body, new ScrollView.LayoutParams(-1, -2));
         LinearLayout group = ui.row(); group.setGravity(Gravity.CENTER_VERTICAL);
-        group.setPadding(ui.dp(24), ui.dp(16), ui.dp(18), ui.dp(16));
+        group.setPadding(ui.dp(24), ui.dp(8), ui.dp(18), ui.dp(8));
         ui.background(group, ui.rounded(palette.surface, 20, 0));
-        body.addView(group, new LinearLayout.LayoutParams(-1, ui.dp(100)));
+        body.addView(group, new LinearLayout.LayoutParams(-1, ui.dp(64)));
         LinearLayout network = ui.row(); network.setGravity(Gravity.CENTER_VERTICAL);
         statusDot = new View(this); ui.background(statusDot, ui.rounded(palette.idle, 6, 0));
         network.addView(statusDot, new LinearLayout.LayoutParams(ui.dp(16), ui.dp(16)));
         LinearLayout networkLabels = ui.column();
-        statusText = ui.text("Checking Wi-Fi", 24, palette.ink, true);
-        networkText = ui.text("Network / Unavailable", 16, palette.muted, false);
+        statusText = ui.text("Checking Wi-Fi", 20, palette.ink, true);
+        networkText = ui.text("Network / Unavailable", 14, palette.muted, false);
         networkText.setSingleLine(true); networkText.setEllipsize(TextUtils.TruncateAt.END);
         networkLabels.addView(statusText);
-        LinearLayout.LayoutParams sub = new LinearLayout.LayoutParams(-1, -2); sub.topMargin = ui.dp(7);
+        LinearLayout.LayoutParams sub = new LinearLayout.LayoutParams(-1, -2); sub.topMargin = ui.dp(4);
         networkLabels.addView(networkText, sub);
         LinearLayout.LayoutParams networkLabelParams = new LinearLayout.LayoutParams(0, -2, 1);
         networkLabelParams.leftMargin = ui.dp(18); network.addView(networkLabels, networkLabelParams);
@@ -336,24 +336,21 @@ public final class MainActivity extends Activity {
         addShortcutTarget(wifi, ShortcutSpec.WIFI);
         targets.add(new Target(copyButton, -1, copyAction));
 
-        TextView tools = ui.text("TOOLS", 12, palette.muted, false);
-        LinearLayout.LayoutParams toolsParams = new LinearLayout.LayoutParams(-1, -2);
-        toolsParams.topMargin = ui.dp(12); toolsParams.bottomMargin = ui.dp(8); toolsParams.leftMargin = ui.dp(4);
-        body.addView(tools, toolsParams);
         LinearLayout list = ui.column();
         ui.background(list, ui.rounded(palette.card, 17, palette.line));
         list.setPadding(ui.dp(2), ui.dp(2), ui.dp(2), ui.dp(2));
-        body.addView(list, new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(-1, -2);
+        listParams.topMargin = ui.dp(12); body.addView(list, listParams);
         LinearLayout carPlay = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
             R.drawable.ic_projection, 0xff9861ff, false);
-        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(80)));
+        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(78)));
         addShortcutTarget(carPlay, ShortcutSpec.PROJECTION);
         LinearLayout.LayoutParams carPlaySeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
         carPlaySeparator.leftMargin = ui.dp(24); carPlaySeparator.rightMargin = ui.dp(24);
         list.addView(ui.divider(false), carPlaySeparator);
         LinearLayout screens = ui.actionRow("All screens", "Browse every available screen",
             R.drawable.ic_screens, palette.screensIcon, false);
-        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(80)));
+        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(78)));
         addTarget(screens, new Runnable() { @Override public void run() {
             tab = TAB_ALL; showPage(ScreenFlow.Page.BROWSER);
         } });
@@ -363,7 +360,7 @@ public final class MainActivity extends Activity {
         list.addView(separator, separatorParams);
         LinearLayout nemesis = ui.actionRow(ShortcutSpec.NEMESIS.title, ShortcutSpec.NEMESIS.subtitle,
             R.drawable.ic_nemesis, 0xff9861ff, false);
-        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(80)));
+        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(78)));
         addShortcutTarget(nemesis, ShortcutSpec.NEMESIS);
 
         updateConnectionViews();
@@ -519,7 +516,7 @@ public final class MainActivity extends Activity {
         column.addView(ui.text(title, 14, palette.muted, false));
         TextView value = ui.text("—", 20, palette.ink, true); value.setTag("value"); value.setSingleLine(true);
         value.setEllipsize(TextUtils.TruncateAt.END);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.topMargin = ui.dp(8);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.topMargin = ui.dp(4);
         column.addView(value, params); return column;
     }
 
