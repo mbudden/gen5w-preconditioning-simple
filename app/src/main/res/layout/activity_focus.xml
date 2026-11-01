@@ -12,7 +12,7 @@
         android:id="@+id/focus_toolbar"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:orientation="horizontal" />
     <FrameLayout
         android:id="@+id/focus_content"
