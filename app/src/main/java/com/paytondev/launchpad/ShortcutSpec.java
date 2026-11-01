@@ -12,7 +12,7 @@ final class ShortcutSpec {
         this.action = action; this.launcher = launcher;
     }
 
-    static final ShortcutSpec PROJECTION = component("CarPlay", "Connect your iPhone",
+    static final ShortcutSpec PROJECTION = component("Phone Projection", "Connect your phone",
         "com.daudio.app.phoneprojection/.settings.ui.DeviceConnectionSettings");
     static final ShortcutSpec NEMESIS = new ShortcutSpec("NEMESIS", "Open NEMESIS Manager",
         "com.nemesis.manager/.MainActivity", "android.intent.action.MAIN", false);

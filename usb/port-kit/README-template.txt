@@ -20,7 +20,7 @@ ON THE COMPUTER
 
 IN THE CAR
 1. Park, turn the car on, and wait for the screen to finish starting.
-2. Insert the drive into the USB DATA port used for wired Android Auto/CarPlay.
+2. Insert the drive into the USB DATA port used for wired phone projection.
 3. Accept the NEMESIS USB prompt by tapping Yes. If it expires, reinsert the
    drive.
 4. Optional, but it helps: right after tapping Yes, hold the right-hand knob

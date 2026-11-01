@@ -2,7 +2,7 @@
 
 **About this guide:** this is for the
 [`gen5w-preconditioning-simple`](https://github.com/mbudden/gen5w-preconditioning-simple)
-fork, set up for an iPhone and CarPlay. It isn't supported by the original project.
+fork. It isn't supported by the original project.
 
 ## Check your car first
 
@@ -73,8 +73,8 @@ personal test USB that opened Manager and required **Run USB NEMESIS.sh**.
 1. Keep the car parked and on **READY**. Wait for infotainment to finish starting.
 2. If a manual conditioning session is already running or waiting, press
    **Stop** and wait for the car to report **Off** before updating anything.
-3. Unplug your iPhone if it is using the port, then insert the drive into the USB
-   **data port** used for wired CarPlay, not a charge-only port.
+3. Unplug your phone if it is using the port, then insert the drive into the USB
+   **data port** used for wired phone projection, not a charge-only port.
 4. Accept NEMESIS's prompt to run the USB item. If it expires, remove and reinsert
    the drive once. This installer does not need the Manager's manual Run button.
 5. Wait for the success result. If it fails, follow **If something goes wrong**
@@ -102,23 +102,22 @@ You do not need to leave the USB plugged in.
    confirmed. If it remains unknown or Stop reports an error, retain the logs.
 
 Holding TUNE opens the app; it does not start heating. Closing the app or
-returning to CarPlay does **not** stop an active manual request. Use Stop.
+returning to phone projection does **not** stop an active manual request. Use Stop.
 You can stop a waiting request yourself at any time. The app also requests
 cancellation after five minutes without confirmed activation, as explained below.
 
-## Using it with an iPhone and CarPlay
+## Using it with phone projection
 
-- **Opening and closing:** hold TUNE to open Launchpad over CarPlay, and hold it
-  again to close it. Closing should drop you back on CarPlay. The EV6 testing
-  behind this guide mentions Android Auto, so check this on your own car.
+- **Opening and closing:** hold TUNE to open Launchpad over phone projection, and
+  hold it again to close it.
 - **Preconditioning tab:** Launchpad always opens here, with **Start** selected
   first on the TUNE knob, so pressing TUNE sends the request.
-- **Shortcuts:** **Advanced -> CarPlay** opens the car's phone connection settings.
+- **Shortcuts:** **Advanced -> Phone Projection** opens the car's phone connection settings.
   To reach Kia's own apps, use **Advanced -> All Screens**.
 - **Routes:** you do not need a Kia navigation route, so you can keep using your
-  usual maps app in CarPlay.
-- **Updating:** wired CarPlay and the USB drive use the same data port, so unplug
-  your iPhone first and plug it back in after infotainment restarts.
+  usual maps app through phone projection.
+- **Updating:** wired phone projection and the USB drive use the same data port, so
+  unplug your phone first and plug it back in after infotainment restarts.
 - **ADB:** the [manual ADB install](ADVANCED-ADB-INSTALL.md) needs Wi-Fi, and an
   iPhone hotspot did not work in the maintainer's testing. Use the USB installer.
 
