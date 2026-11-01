@@ -9,7 +9,7 @@ final class Palette {
     final int ink, muted, secondary;
     /** Accent fill, text on it, accent-colored text, and its pressed / knob-activated tints. */
     final int accent, onAccent, link, pressed, activated;
-    /** Navigation hero, the copy button, the All screens icon, and the idle status dot. */
+    /** Navigation hero, the copy button, the All Screens icon, and the idle status dot. */
     final int hero, quiet, screensIcon, idle;
     /** Gauge track below and above the warm threshold. */
     final int coldTrack, warmTrack;

@@ -16,7 +16,7 @@ final class ShortcutSpec {
         "com.daudio.app.phoneprojection/.settings.ui.DeviceConnectionSettings");
     static final ShortcutSpec NEMESIS = new ShortcutSpec("NEMESIS", "Open NEMESIS Manager",
         "com.nemesis.manager/.MainActivity", "android.intent.action.MAIN", false);
-    static final ShortcutSpec WIFI = new ShortcutSpec("Wi-Fi settings", "Manage wireless connections",
+    static final ShortcutSpec WIFI = new ShortcutSpec("Wi-Fi Settings", "Manage wireless connections",
         null, "android.settings.WIFI_SETTINGS", false);
 
     private static ShortcutSpec component(String title, String subtitle, String component) {

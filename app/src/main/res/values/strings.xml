@@ -4,14 +4,14 @@
     <string name="close">Close</string>
     <string name="tab_favorites">Favorites</string>
     <string name="tab_apps">Apps</string>
-    <string name="tab_all">All screens</string>
-    <string name="wifi">Wi-Fi settings</string>
+    <string name="tab_all">All Screens</string>
+    <string name="wifi">Wi-Fi Settings</string>
     <string name="wifi_off">Wi-Fi is off</string>
     <string name="wifi_not_connected">On · not connected</string>
     <string name="nemesis">NEMESIS</string>
     <string name="nemesis_sub">Manager</string>
     <string name="loading">Loading apps…</string>
-    <string name="no_favorites">No favorites yet. Long-press any app in Apps or All screens to add it here.</string>
+    <string name="no_favorites">No favorites yet. Long-press any app in Apps or All Screens to add it here.</string>
     <string name="no_apps">Nothing to show.</string>
     <string name="fav_added">Added %1$s to favorites</string>
     <string name="fav_removed">Removed %1$s from favorites</string>
