@@ -40,7 +40,7 @@ final class PreconditioningSnapshot {
             case CHECKING: return "Checking";
             case UNAVAILABLE: return "Unavailable";
             case IDLE: return indicator == 1 ? "Active · car controlled" : "Ready";
-            case WARM: return "Battery warm · resets in " + resetSeconds + "s";
+            case WARM: return "Battery warm";
             case WAITING: return "Request sent";
             case ACTIVE: return "Active";
             case STOPPING: return "Stop requested";

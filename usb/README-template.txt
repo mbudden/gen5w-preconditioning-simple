@@ -27,7 +27,7 @@ ON THE COMPUTER
 IN THE CAR
 1. Park and keep the car on READY. Wait for infotainment to finish starting.
 2. Before updating or uninstalling, Stop any pending or active manual session
-   and confirm the Preconditioning tab shows Car indicator: Off. Closing Launchpad is not Stop.
+   and confirm the Preconditioning tab shows Car Indicator: Off. Closing Launchpad is not Stop.
 3. Unplug your iPhone if it is using the port, then insert the drive into the USB
    DATA port used for wired CarPlay.
 4. Accept the NEMESIS USB execution prompt. If it expires, reinsert the drive.
@@ -41,7 +41,7 @@ IN THE CAR
 USING PRECONDITIONING
 Enable Battery conditioning mode in the car's EV settings. Start requests
 conditioning; Request sent is not confirmation. Active means the car reports
-conditioning active. Stop cancels; wait for Session ended and Car indicator: Off.
+conditioning active. Stop cancels; wait for Session ended and Car Indicator: Off.
 On supported EV6 and Ioniq 5 NEEV US software, Battery warm offers a
 ten-second reset or explicit Start anyway. The car still decides whether to
 activate. A request never seen Active has a five-minute cancellation timer;

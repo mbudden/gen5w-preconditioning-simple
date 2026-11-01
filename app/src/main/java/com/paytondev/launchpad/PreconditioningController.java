@@ -11,7 +11,6 @@ final class PreconditioningController {
     private boolean requested, activeSeen, stopping, released, commandFailed, activationTimedOut;
     private long startedAt, endedAt, nextMaintenance;
     private long warmUntil;
-    private int warmTemperatureC;
     private PreconditioningSnapshot.State state = PreconditioningSnapshot.State.CHECKING;
     private String detail = "Checking vehicle services";
     private String commandError = "";
@@ -132,7 +131,6 @@ final class PreconditioningController {
         warmUntil = 0;
         if (!requestAnyway && BatteryTemperature.isWarm(minimumTemperatureC, vehicle.warmThresholdC())) {
             warmUntil = now + WARM_NOTICE_MS;
-            warmTemperatureC = minimumTemperatureC;
             endedAt = 0;
             state = PreconditioningSnapshot.State.WARM;
             // This is a local advisory: do not journal, Start, maintain or cancel.
@@ -188,10 +186,9 @@ final class PreconditioningController {
         long resetSeconds = state == PreconditioningSnapshot.State.WARM && warmUntil > now
             ? (warmUntil - now + 999) / 1000 : 0;
         String displayDetail = resetSeconds > 0
-            ? "Battery minimum " + warmTemperatureC + "°C is at or above the expected heating threshold ("
+            ? "At or above the expected heating threshold ("
                 + vehicle.warmThresholdC() + "°C / " + BatteryTemperatureReading.fahrenheit(vehicle.warmThresholdC())
-                + "°F). No request sent. Button resets in "
-                + resetSeconds + " seconds. Start anyway sends a manual request; the car decides whether to heat."
+                + "°F). No request sent. Resets in " + resetSeconds + "s."
             : detail;
         // A successful read passed the firmware gate; read errors only name firmware when it failed.
         int supported = !vehicle.unavailableReason().isEmpty() ? PreconditioningSnapshot.FAIL
