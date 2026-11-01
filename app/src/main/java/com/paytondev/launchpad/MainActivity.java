@@ -261,9 +261,6 @@ public final class MainActivity extends Activity {
         highestColumn = null; failureRow = null; gauge = null; chart = null; toggleColor = 0;
         Arrays.fill(checkMarks, null); Arrays.fill(checkValues, null);
         content.removeAllViews(); toolbar.removeAllViews();
-        LinearLayout.LayoutParams contentParams = (LinearLayout.LayoutParams) content.getLayoutParams();
-        contentParams.topMargin = ui.dp(page == ScreenFlow.Page.ADVANCED ? 28 : 16);
-        content.setLayoutParams(contentParams);
         buildToolbar();
         if (page == ScreenFlow.Page.PRECONDITIONING) buildPreconditioning();
         else if (page == ScreenFlow.Page.ADVANCED) buildAdvanced();
@@ -305,7 +302,7 @@ public final class MainActivity extends Activity {
         network.addView(statusDot, new LinearLayout.LayoutParams(ui.dp(16), ui.dp(16)));
         LinearLayout networkLabels = ui.column();
         statusText = ui.text("Checking Wi-Fi", 20, palette.ink, true);
-        networkText = ui.text("Network / Unavailable", 14, palette.muted, false);
+        networkText = ui.text("Unavailable", 14, palette.muted, false);
         networkText.setSingleLine(true); networkText.setEllipsize(TextUtils.TruncateAt.END);
         networkLabels.addView(statusText);
         LinearLayout.LayoutParams sub = new LinearLayout.LayoutParams(-1, -2); sub.topMargin = ui.dp(4);
@@ -343,14 +340,14 @@ public final class MainActivity extends Activity {
         listParams.topMargin = ui.dp(12); body.addView(list, listParams);
         LinearLayout carPlay = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
             R.drawable.ic_projection, 0xff9861ff, false);
-        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(68)));
+        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(74)));
         addShortcutTarget(carPlay, ShortcutSpec.PROJECTION);
         LinearLayout.LayoutParams carPlaySeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
         carPlaySeparator.leftMargin = ui.dp(24); carPlaySeparator.rightMargin = ui.dp(24);
         list.addView(ui.divider(false), carPlaySeparator);
         LinearLayout screens = ui.actionRow("All Screens", "Browse every available screen",
             R.drawable.ic_screens, palette.screensIcon, false);
-        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(68)));
+        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(74)));
         addTarget(screens, new Runnable() { @Override public void run() {
             tab = TAB_ALL; showPage(ScreenFlow.Page.BROWSER);
         } });
@@ -360,7 +357,7 @@ public final class MainActivity extends Activity {
         list.addView(separator, separatorParams);
         LinearLayout nemesis = ui.actionRow(ShortcutSpec.NEMESIS.title, ShortcutSpec.NEMESIS.subtitle,
             R.drawable.ic_nemesis, 0xff9861ff, false);
-        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(68)));
+        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(74)));
         addShortcutTarget(nemesis, ShortcutSpec.NEMESIS);
 
         updateConnectionViews();
@@ -465,9 +462,12 @@ public final class MainActivity extends Activity {
         long now = SystemClock.elapsedRealtime();
         preconditionStatus.setText(preconditioning.title());
         if (preconditionDetail != null) preconditionDetail.setText(preconditioning.detail);
-        if (preconditionElapsed != null) preconditionElapsed.setText("Elapsed: " +
-            (preconditioning.requested || preconditioning.state == PreconditioningSnapshot.State.ENDED
-                || preconditioning.state == PreconditioningSnapshot.State.TIMED_OUT ? preconditioning.elapsed() : "—"));
+        if (preconditionElapsed != null) {
+            boolean session = preconditioning.requested || preconditioning.state == PreconditioningSnapshot.State.ENDED
+                || preconditioning.state == PreconditioningSnapshot.State.TIMED_OUT;
+            preconditionElapsed.setVisibility(session ? View.VISIBLE : View.GONE);
+            if (session) preconditionElapsed.setText("Elapsed: " + preconditioning.elapsed());
+        }
         if (lowestValue != null) updateTemperatureViews(now);
         if (preconditionButton != null) {
             boolean warm = preconditioning.state == PreconditioningSnapshot.State.WARM;
@@ -688,7 +688,7 @@ public final class MainActivity extends Activity {
         String status = connection.state == ConnectionSnapshot.State.CONNECTED ? "Connected"
             : connection.state == ConnectionSnapshot.State.OFF ? "Wi-Fi off"
             : connection.state == ConnectionSnapshot.State.DISCONNECTED ? "Disconnected" : "Unavailable";
-        statusText.setText(status); networkText.setText("Network / " + connection.network);
+        statusText.setText(status); networkText.setText(connection.network);
         ipText.setText(connection.ip); adbText.setText(connection.adb);
         ui.background(statusDot, ui.rounded(connection.state == ConnectionSnapshot.State.CONNECTED ? 0xff1acb59 : palette.idle, 7, 0));
         copyButton.setEnabled(connection.canCopy); copyButton.setAlpha(connection.canCopy ? 1f : 0.4f);
