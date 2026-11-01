@@ -338,13 +338,13 @@ public final class MainActivity extends Activity {
         list.setPadding(ui.dp(2), ui.dp(2), ui.dp(2), ui.dp(2));
         LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(-1, -2);
         listParams.topMargin = ui.dp(12); body.addView(list, listParams);
-        LinearLayout carPlay = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
+        LinearLayout projection = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
             R.drawable.ic_projection, 0xff9861ff, false);
-        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(74)));
-        addShortcutTarget(carPlay, ShortcutSpec.PROJECTION);
-        LinearLayout.LayoutParams carPlaySeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
-        carPlaySeparator.leftMargin = ui.dp(24); carPlaySeparator.rightMargin = ui.dp(24);
-        list.addView(ui.divider(false), carPlaySeparator);
+        list.addView(projection, new LinearLayout.LayoutParams(-1, ui.dp(74)));
+        addShortcutTarget(projection, ShortcutSpec.PROJECTION);
+        LinearLayout.LayoutParams projectionSeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
+        projectionSeparator.leftMargin = ui.dp(24); projectionSeparator.rightMargin = ui.dp(24);
+        list.addView(ui.divider(false), projectionSeparator);
         LinearLayout screens = ui.actionRow("All Screens", "Browse every available screen",
             R.drawable.ic_screens, palette.screensIcon, false);
         list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(74)));
