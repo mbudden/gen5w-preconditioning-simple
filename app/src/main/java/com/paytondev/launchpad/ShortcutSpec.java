@@ -12,13 +12,7 @@ final class ShortcutSpec {
         this.action = action; this.launcher = launcher;
     }
 
-    static final ShortcutSpec NAVIGATION = component("Navigation", "Choose a destination",
-        "com.mnsoft.navi/.NaviApp");
-    static final ShortcutSpec MUSIC = component("Music", "Open media",
-        "com.hkmc.av.app.mediagate/.MediaGateActivity");
-    static final ShortcutSpec PHONE = component("Phone", "Calls and contacts",
-        "com.hkmc.bluetooth/com.android.contacts.DialtactsActivity");
-    static final ShortcutSpec PROJECTION = component("Projection", "Connect your phone",
+    static final ShortcutSpec PROJECTION = component("CarPlay", "Connect your iPhone",
         "com.daudio.app.phoneprojection/.settings.ui.DeviceConnectionSettings");
     static final ShortcutSpec NEMESIS = new ShortcutSpec("NEMESIS", "Open NEMESIS Manager",
         "com.nemesis.manager/.MainActivity", "android.intent.action.MAIN", false);

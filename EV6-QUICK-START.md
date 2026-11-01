@@ -76,8 +76,8 @@ personal test USB that opened Manager and required **Run USB NEMESIS.sh**.
 1. Keep the car parked and on **READY**. Wait for infotainment to finish starting.
 2. If a manual conditioning session is already running or waiting, press
    **Stop** and wait for the car to report **Off** before updating anything.
-3. Insert the drive into the USB **data port** used for wired Android Auto or
-   CarPlay, not a charge-only port.
+3. Unplug your iPhone if it is using the port, then insert the drive into the USB
+   **data port** used for wired CarPlay, not a charge-only port.
 4. Accept NEMESIS's prompt to run the USB item. If it expires, remove and reinsert
    the drive once. This installer does not need the Manager's manual Run button.
 5. Wait for the success result. If it fails, follow **If something goes wrong**
@@ -95,7 +95,7 @@ You do not need to leave the USB plugged in.
    an infotainment update; a previous setting is not proof it is still enabled.
 2. For the first check, keep the car parked in READY with **no active Kia
    navigation route**. You do not need to select a charger in Kia navigation.
-3. Hold **TUNE** to open Launchpad. Tap **Start** beside Preconditioning.
+3. Hold **TUNE** to open Launchpad. Tap **Start**.
 4. **Request sent** means the request was sent; it does not mean heating has
    started. **Active** means the car reports conditioning active. Activation is
    not guaranteed: the car decides whether temperature, charge, and other
@@ -105,9 +105,27 @@ You do not need to leave the USB plugged in.
    confirmed. If it remains unknown or Stop reports an error, retain the logs.
 
 Holding TUNE opens the app; it does not start heating. Closing the app or
-returning to Android Auto does **not** stop an active manual request. Use Stop.
+returning to CarPlay does **not** stop an active manual request. Use Stop.
 You can stop a waiting request yourself at any time. The app also requests
 cancellation after five minutes without confirmed activation, as explained below.
+
+## Using it with an iPhone and CarPlay
+
+- **Opening and closing:** hold TUNE to open Launchpad over CarPlay, and hold it
+  again to close it. Closing should drop you back on CarPlay. The EV6 testing
+  behind this guide mentions Android Auto, so check this on your own car.
+- **Home tab:** the main tile is preconditioning, with **Start** selected first
+  on the TUNE knob, so pressing TUNE on this tab sends the request. **CarPlay**
+  opens the car's phone connection settings, and **Battery details** opens the
+  preconditioning tab. To reach Kia's own apps, use **Advanced -> All screens**.
+- **Opening on Home:** Launchpad opens on the preconditioning tab by default. To
+  change that, go to **Advanced -> Default tab**.
+- **Routes:** you do not need a Kia navigation route, so you can keep using your
+  usual maps app in CarPlay.
+- **Updating:** wired CarPlay and the USB drive use the same data port, so unplug
+  your iPhone first and plug it back in after infotainment restarts.
+- **ADB:** the [manual ADB install](ADVANCED-ADB-INSTALL.md) needs Wi-Fi, and an
+  iPhone hotspot did not work in the maintainer's testing. Use the USB installer.
 
 ## Reading the temperature
 
