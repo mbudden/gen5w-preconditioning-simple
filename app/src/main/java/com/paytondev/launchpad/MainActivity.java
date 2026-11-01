@@ -72,10 +72,8 @@ public final class MainActivity extends Activity {
     private TemperatureChart chart;
     private final CheckMark[] checkMarks = new CheckMark[6];
     private final TextView[] checkValues = new TextView[6];
-    private final TextView[] appearanceChips = new TextView[AppearanceMode.values().length];
     private ScrollView advancedScroll;
     private Palette palette = Palette.LIGHT;
-    private AppearanceMode appearance = AppearanceMode.FOLLOW_CAR;
     private boolean carNight, compact, splitObserved;
     private int rightPadding;
     private PreconditioningService.LocalBinder vehicleService;
@@ -150,9 +148,8 @@ public final class MainActivity extends Activity {
         prefs = getSharedPreferences("launchpad", MODE_PRIVATE);
         favorites = new Favorites(this);
         adapter = new TileAdapter(getLayoutInflater(), favorites);
-        appearance = AppearanceMode.fromPreference(prefs.getString("appearance", null));
         carNight = DisplaySignals.night(this, getResources().getConfiguration());
-        palette = Palette.of(appearance.dark(carNight));
+        palette = Palette.of(carNight);
         ui = new FocusUi(this, palette); adapter.setUi(ui); applyWindowColors();
         rightPadding = findViewById(R.id.focus_root).getPaddingRight();
         compact = splitScreenOn(); applySplitPadding();
@@ -213,7 +210,7 @@ public final class MainActivity extends Activity {
     }
     /** Rebuilds the current page in the resolved palette, keeping the TUNE selection. */
     private void applyAppearance() {
-        Palette next = Palette.of(appearance.dark(carNight));
+        Palette next = Palette.of(carNight);
         if (next == palette) return;
         palette = next; ui = new FocusUi(this, palette); adapter.setUi(ui); applyWindowColors();
         rebuildPage();
@@ -263,7 +260,6 @@ public final class MainActivity extends Activity {
         lowestValue = null; lowestCelsius = null; highestValue = null; temperatureAge = null;
         highestColumn = null; failureRow = null; gauge = null; chart = null; toggleColor = 0;
         Arrays.fill(checkMarks, null); Arrays.fill(checkValues, null);
-        Arrays.fill(appearanceChips, null);
         content.removeAllViews(); toolbar.removeAllViews();
         LinearLayout.LayoutParams contentParams = (LinearLayout.LayoutParams) content.getLayoutParams();
         contentParams.topMargin = ui.dp(page == ScreenFlow.Page.ADVANCED ? 28 : 16);
@@ -339,34 +335,6 @@ public final class MainActivity extends Activity {
         wifiParams.leftMargin = ui.dp(22); group.addView(wifi, wifiParams);
         addShortcutTarget(wifi, ShortcutSpec.WIFI);
         targets.add(new Target(copyButton, -1, copyAction));
-
-        LinearLayout look = ui.row(); look.setGravity(Gravity.CENTER_VERTICAL);
-        look.setPadding(ui.dp(24), ui.dp(16), ui.dp(20), ui.dp(16));
-        ui.background(look, ui.rounded(palette.surface, 20, 0));
-        LinearLayout.LayoutParams lookParams = new LinearLayout.LayoutParams(-1, -2);
-        lookParams.topMargin = ui.dp(12); body.addView(look, lookParams);
-        LinearLayout lookDetails = ui.column();
-        lookDetails.addView(ui.text("Appearance", 24, palette.ink, true));
-        LinearLayout.LayoutParams lookHint = new LinearLayout.LayoutParams(-2, -2); lookHint.topMargin = ui.dp(7);
-        lookDetails.addView(ui.text(appearance == AppearanceMode.FOLLOW_CAR ? "Follows the car's day/night display"
-            : "Always " + appearance.title.toLowerCase(java.util.Locale.US), 16, palette.muted, false), lookHint);
-        look.addView(lookDetails, new LinearLayout.LayoutParams(0, -2, 1));
-        LinearLayout modes = ui.row(); modes.setPadding(ui.dp(4), ui.dp(4), ui.dp(4), ui.dp(4));
-        ui.background(modes, ui.rounded(palette.card, 28, 0));
-        look.addView(modes);
-        final AppearanceMode[] modeValues = AppearanceMode.values();
-        for (int i = 0; i < modeValues.length; i++) {
-            final AppearanceMode mode = modeValues[i];
-            appearanceChips[i] = chip(mode.title, mode == appearance, palette.card);
-            modes.addView(appearanceChips[i], new LinearLayout.LayoutParams(ui.dp(i == 0 ? 150 : 110), ui.dp(40)));
-            addTarget(appearanceChips[i], new Runnable() { @Override public void run() {
-                if (mode == appearance) return;
-                appearance = mode; prefs.edit().putString("appearance", mode.name()).apply();
-                Palette before = palette; applyAppearance();
-                // Same palette: the page wasn't rebuilt, so restyle the chips here.
-                if (before == palette) rebuildPage();
-            } });
-        }
 
         TextView tools = ui.text("TOOLS", 12, palette.muted, false);
         LinearLayout.LayoutParams toolsParams = new LinearLayout.LayoutParams(-1, -2);

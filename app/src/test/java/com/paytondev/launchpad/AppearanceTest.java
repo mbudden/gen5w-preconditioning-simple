@@ -4,17 +4,6 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AppearanceTest {
-    @Test public void followCarMirrorsTheCarAndFixedModesIgnoreIt() {
-        assertFalse(AppearanceMode.FOLLOW_CAR.dark(false));
-        assertTrue(AppearanceMode.FOLLOW_CAR.dark(true));
-        assertFalse(AppearanceMode.LIGHT.dark(true));
-        assertTrue(AppearanceMode.DARK.dark(false));
-    }
-    @Test public void unknownPreferenceFollowsTheCar() {
-        assertEquals(AppearanceMode.FOLLOW_CAR, AppearanceMode.fromPreference(null));
-        assertEquals(AppearanceMode.FOLLOW_CAR, AppearanceMode.fromPreference("SEPIA"));
-        assertEquals(AppearanceMode.DARK, AppearanceMode.fromPreference("DARK"));
-    }
     @Test public void lightPaletteKeepsTheOriginalColors() {
         assertEquals(0xffffffff, Palette.LIGHT.background);
         assertEquals(0xfff0f2f6, Palette.LIGHT.surface);
