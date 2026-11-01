@@ -11,8 +11,8 @@ not the proposed public release sequence.
 
 - Hold TUNE to open Launchpad, then use Start/Stop without a Kia navigation route.
 - Exact firmware checks for the tested US 2023 EV6 Wind RWD / Gen5W 260507 profile.
-- Native lowest battery-pack temperature, Fahrenheit on Home and both units in
-  Advanced. No OBD adapter or phone bridge is required.
+- Native lowest battery-pack temperature, in both units on the Preconditioning
+  tab. No OBD adapter or phone bridge is required.
 - A ten-second warm-battery advisory with an explicit Start anyway option.
 - Cancellation of a request never observed Active after five minutes, retaining
   the unresolved session until cancellation succeeds and fresh Off is received.
