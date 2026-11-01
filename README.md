@@ -4,6 +4,15 @@ A simple app that adds a manual battery preconditioning button to your Kia EV6.
 
 Hold the TUNE knob, press **Start**, and the app asks the car to start conditioning the battery. You don't need a navigation destination. The app is called Launchpad, which is the name you'll see in NEMESIS Manager and in this guide.
 
+## Previews
+
+| Light | Dark |
+| --- | --- |
+| ![Preconditioning screen in light mode](docs/previews/preconditioning-light.png) | ![Preconditioning screen in dark mode](docs/previews/preconditioning-dark.png) |
+| ![Advanced screen in light mode](docs/previews/advanced-light.png) | ![Advanced screen in dark mode](docs/previews/advanced-dark.png) |
+
+These screenshots are from a slightly earlier build, so some labels and details differ. Network details are hidden.
+
 ## What it is
 
 - **A manual preconditioning button.** It lets you ask the car to condition the battery before DC fast charging, without setting a charger as a route in Kia's navigation.
