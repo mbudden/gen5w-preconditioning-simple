@@ -10,8 +10,6 @@
     <string name="wifi_not_connected">On · not connected</string>
     <string name="nemesis">NEMESIS</string>
     <string name="nemesis_sub">Manager</string>
-    <string name="car_home">Car home</string>
-    <string name="car_home_sub">Hyundai launcher</string>
     <string name="loading">Loading apps…</string>
     <string name="no_favorites">No favorites yet. Long-press any app in Apps or All screens to add it here.</string>
     <string name="no_apps">Nothing to show.</string>

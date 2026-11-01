@@ -43,7 +43,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 /** APK-contained touch and TUNE launcher; the external hold service is unchanged. */
 public final class MainActivity extends Activity {
@@ -77,10 +76,8 @@ public final class MainActivity extends Activity {
     private ScrollView advancedScroll;
     private Palette palette = Palette.LIGHT;
     private AppearanceMode appearance = AppearanceMode.FOLLOW_CAR;
-    private boolean carNight, signalsReading, compact, splitObserved;
+    private boolean carNight, compact, splitObserved;
     private int rightPadding;
-    private TextView signalsText;
-    private SignalLog signals;
     private PreconditioningService.LocalBinder vehicleService;
     private PreconditioningSnapshot preconditioning = PreconditioningSnapshot.checking();
     private BatteryTemperatureReading batteryTemperature = BatteryTemperatureReading.checking();
@@ -110,14 +107,6 @@ public final class MainActivity extends Activity {
             if (resumed && page == ScreenFlow.Page.ADVANCED) {
                 refreshConnection();
                 main.postDelayed(this, 5000);
-            }
-        }
-    };
-    private final Runnable signalsTick = new Runnable() {
-        @Override public void run() {
-            if (resumed && page == ScreenFlow.Page.ADVANCED) {
-                refreshSignals();
-                main.postDelayed(this, 2000);
             }
         }
     };
@@ -208,7 +197,7 @@ public final class MainActivity extends Activity {
         main.removeCallbacks(preconditioningTick); preconditioningTick.run();
     }
     @Override protected void onPause() {
-        resumed = false; connectionEpoch++; main.removeCallbacks(connectionTick); main.removeCallbacks(signalsTick);
+        resumed = false; connectionEpoch++; main.removeCallbacks(connectionTick);
         main.removeCallbacks(preconditioningTick);
         if (receiverRegistered) { unregisterReceiver(wifiChanges); receiverRegistered = false; }
         if (splitObserved) { getContentResolver().unregisterContentObserver(splitChanges); splitObserved = false; }
@@ -266,7 +255,6 @@ public final class MainActivity extends Activity {
 
     private void showPage(ScreenFlow.Page next) {
         // A day/night rebuild of Advanced keeps the log: that switch is what it records.
-        if (next != page || next != ScreenFlow.Page.ADVANCED) signals = null;
         page = next; connectionEpoch++;
         targets.clear(); headerTargets.clear(); grid = null;
         advancedScroll = null;
@@ -276,7 +264,6 @@ public final class MainActivity extends Activity {
         highestColumn = null; failureRow = null; gauge = null; chart = null; toggleColor = 0;
         Arrays.fill(checkMarks, null); Arrays.fill(checkValues, null);
         Arrays.fill(appearanceChips, null);
-        signalsText = null;
         content.removeAllViews(); toolbar.removeAllViews();
         LinearLayout.LayoutParams contentParams = (LinearLayout.LayoutParams) content.getLayoutParams();
         contentParams.topMargin = ui.dp(page == ScreenFlow.Page.ADVANCED ? 28 : 16);
@@ -293,8 +280,8 @@ public final class MainActivity extends Activity {
     }
 
     private void buildToolbar() {
-        TextView title = ui.text("Launchpad", 36, palette.ink, true);
-        toolbar.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
+        // The root's left and right padding differ; even them out to center on the visible screen.
+        toolbar.setPadding(compact ? 0 : ui.dp(32), 0, compact ? ui.dp(32) : 0, 0);
         LinearLayout segmented = ui.row(); segmented.setPadding(ui.dp(4), ui.dp(4), ui.dp(4), ui.dp(4));
         ui.background(segmented, ui.rounded(palette.surface, 28, 0));
         ScreenFlow.Page current = page == ScreenFlow.Page.BROWSER ? ScreenFlow.Page.ADVANCED : page;
@@ -306,12 +293,6 @@ public final class MainActivity extends Activity {
             clickable(chip, action); headerTargets.add(new Target(chip, -1, action));
         }
         toolbar.addView(segmented);
-        LinearLayout carHome = ui.button("Car home", R.drawable.ic_car, false, 154);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ui.dp(154), ui.dp(48));
-        params.leftMargin = ui.dp(compact ? 16 : 28); toolbar.addView(carHome, params);
-        Runnable homeAction = shortcutAction(ShortcutSpec.CAR_HOME);
-        clickable(carHome, homeAction); ui.available(carHome, available(ShortcutSpec.CAR_HOME), "");
-        headerTargets.add(new Target(carHome, -1, homeAction));
     }
 
     private void buildAdvanced() {
@@ -417,16 +398,6 @@ public final class MainActivity extends Activity {
         list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(80)));
         addShortcutTarget(nemesis, ShortcutSpec.NEMESIS);
 
-        LinearLayout probe = ui.column(); probe.setPadding(ui.dp(24), ui.dp(16), ui.dp(20), ui.dp(16));
-        ui.background(probe, ui.rounded(palette.surface, 20, 0));
-        LinearLayout.LayoutParams probeParams = new LinearLayout.LayoutParams(-1, -2);
-        probeParams.topMargin = ui.dp(12); body.addView(probe, probeParams);
-        probe.addView(ui.text("Appearance signals", 24, palette.ink, true));
-        probe.addView(ui.text("Read-only. Switch the Hyundai display between Day and Night (and Auto with the "
-            + "headlights on and off), then report which lines changed.", 16, palette.muted, false), below(7));
-        signalsText = ui.text("Reading…", 14, palette.ink, false);
-        signalsText.setTypeface(android.graphics.Typeface.MONOSPACE); signalsText.setLineSpacing(0, 1.15f);
-        probe.addView(signalsText, below(12));
         updateConnectionViews();
     }
 
@@ -662,7 +633,6 @@ public final class MainActivity extends Activity {
         Intent intent = new Intent(spec.action);
         if (spec.component != null) intent.setComponent(ComponentName.unflattenFromString(spec.component));
         if (spec.launcher) intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        if (spec == ShortcutSpec.CAR_HOME) intent.addCategory(Intent.CATEGORY_HOME);
         return intent;
     }
     private boolean available(ShortcutSpec spec) {
@@ -706,26 +676,8 @@ public final class MainActivity extends Activity {
     }
 
     private void restartConnectionTick() {
-        main.removeCallbacks(connectionTick); main.removeCallbacks(signalsTick);
-        if (resumed && page == ScreenFlow.Page.ADVANCED) { main.post(connectionTick); main.post(signalsTick); }
-    }
-    private void refreshSignals() {
-        if (signalsReading) return;
-        signalsReading = true;
-        final int epoch = connectionEpoch;
-        final Context app = getApplicationContext();
-        new Thread(new Runnable() {
-            @Override public void run() {
-                final Map<String, String> values = DisplaySignals.read(app);
-                main.post(new Runnable() { @Override public void run() {
-                    signalsReading = false;
-                    if (isFinishing() || !resumed || page != ScreenFlow.Page.ADVANCED || epoch != connectionEpoch
-                        || signalsText == null) return;
-                    if (signals == null) signals = new SignalLog(values); else signals.update(values);
-                    signalsText.setText(TextUtils.join("\n", signals.lines()));
-                } });
-            }
-        }, "launchpad-display-signals").start();
+        main.removeCallbacks(connectionTick);
+        if (resumed && page == ScreenFlow.Page.ADVANCED) { main.post(connectionTick); }
     }
     private void refreshConnection() {
         if (connectionReading) return;

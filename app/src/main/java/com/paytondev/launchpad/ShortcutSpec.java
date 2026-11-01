@@ -18,8 +18,6 @@ final class ShortcutSpec {
         "com.nemesis.manager/.MainActivity", "android.intent.action.MAIN", false);
     static final ShortcutSpec WIFI = new ShortcutSpec("Wi-Fi settings", "Manage wireless connections",
         null, "android.settings.WIFI_SETTINGS", false);
-    static final ShortcutSpec CAR_HOME = new ShortcutSpec("Car home", "", null,
-        "android.intent.action.MAIN", false);
 
     private static ShortcutSpec component(String title, String subtitle, String component) {
         return new ShortcutSpec(title, subtitle, component, "android.intent.action.MAIN", true);

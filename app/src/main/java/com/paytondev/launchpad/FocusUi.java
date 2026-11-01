@@ -40,7 +40,7 @@ final class FocusUi {
         v.setLayoutParams(new LinearLayout.LayoutParams(dp(size), dp(size)));
         v.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         // These glyphs are drawn in dark grey; in dark mode they take the secondary text color.
-        if (p.dark && (resource == R.drawable.ic_car || resource == R.drawable.ic_chevron || resource == R.drawable.ic_copy))
+        if (p.dark && (resource == R.drawable.ic_chevron || resource == R.drawable.ic_copy))
             v.setColorFilter(p.secondary, PorterDuff.Mode.SRC_IN);
         return v;
     }
