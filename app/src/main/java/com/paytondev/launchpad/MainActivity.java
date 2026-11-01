@@ -430,7 +430,7 @@ public final class MainActivity extends Activity {
 
         LinearLayout checks = panel(body, 0.26f, 16);
         checks.addView(caption("VEHICLE CHECKS"));
-        String[] labels = {"EV READY", "Battery conditioning", "Car indicator", "Firmware profile", "Temperature source", "Failure code"};
+        String[] labels = {"EV is READY", "Battery Conditioning", "Car Indicator", "Firmware Profile", "Temperature Source", "Failure Code"};
         for (int i = 0; i < labels.length; i++) {
             LinearLayout row = ui.row(); row.setGravity(Gravity.CENTER_VERTICAL);
             checkMarks[i] = new CheckMark(this);

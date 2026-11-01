@@ -98,7 +98,7 @@ You do not need to leave the USB plugged in.
    not guaranteed: the car decides whether temperature, charge, and other
    conditions allow it.
 5. Tap **Stop** to cancel, even while waiting. Wait for **Session ended** and the
-   Preconditioning tab's **Car indicator: Off** before considering cancellation
+   Preconditioning tab's **Car Indicator: Off** before considering cancellation
    confirmed. If it remains unknown or Stop reports an error, retain the logs.
 
 Holding TUNE opens the app; it does not start heating. Closing the app or
