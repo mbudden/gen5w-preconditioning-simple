@@ -76,16 +76,19 @@ final class TemperatureChart extends View {
         long start = start(samples, now);
         label.setTextAlign(Paint.Align.RIGHT);
         line.setStrokeWidth(dp); line.setColor(palette.line);
+        float threshold = y(thresholdC, range[0], range[1], top, height);
         for (float c : range) {
             float yy = y(c, range[0], range[1], top, height);
             canvas.drawLine(left, yy, left + width, yy, line);
-            canvas.drawText(BatteryTemperatureReading.fahrenheit(c) + "°F", left - 8 * dp, yy + 5 * dp, label);
+            // A wide range puts the threshold beside this label; the threshold label wins.
+            if (Math.abs(yy - threshold) >= 16 * dp)
+                canvas.drawText(BatteryTemperatureReading.fahrenheit(c) + "°F", left - 8 * dp, yy + 5 * dp, label);
         }
-        float threshold = y(thresholdC, range[0], range[1], top, height);
         path.reset(); path.moveTo(left, threshold); path.lineTo(left + width, threshold);
         canvas.drawPath(path, dashed);
+        // In the axis gutter, where the trace can't cross it.
         label.setColor(TemperatureGauge.WARM); label.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(BatteryTemperatureReading.fahrenheit(thresholdC) + "°F", left + width, threshold - 6 * dp, label);
+        canvas.drawText(BatteryTemperatureReading.fahrenheit(thresholdC) + "°F", left - 8 * dp, threshold + 5 * dp, label);
         label.setColor(palette.muted);
         // The session marker's label sits in the time axis row, replacing an end label it would hit.
         float axis = top + height + 20 * dp, sx = -1;
