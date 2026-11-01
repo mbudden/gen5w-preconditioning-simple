@@ -6,8 +6,7 @@ Packages -> Launchpad -> Uninstall; NEMESIS stays installed. There is no
 uninstall drive.
 
 BEFORE YOU BEGIN
-Use a maintainer release whose notes explicitly support your head unit and
-software. EV6 support was tested on a US 2023 EV6 Wind RWD, Gen5W software
+Check that your head unit and software are in COMPATIBILITY.md. EV6 support was tested on a US 2023 EV6 Wind RWD, Gen5W software
 CV_E.USA.S5W_M.V015.012.260507. Ioniq 5 NEEV US support was tested on a US
 2022 Ioniq 5 SE AWD, software NEEV.USA.0000.V015.012.260507. Other matching
 cars and model years are untested.
@@ -62,9 +61,9 @@ or clear app data. Report the release, model/year/market, full software version,
 action and error. Remove personal information before posting logs publicly.
 "No supported files" alone is a media-player message, not an installation result.
 
-Full EV6 guide and release status:
-https://github.com/paytondevs/ioniq5-preconditioning
-Check the EV6-QUICK-START.md file in the source matching your release.
+Full EV6 guide:
+https://github.com/mbudden/gen5w-preconditioning-simple/blob/main/EV6-QUICK-START.md
+This fork is not supported by the original project.
 
 Original app: paytondevs and contributors.
 EV6 development, documentation and vehicle testing: Abro86.

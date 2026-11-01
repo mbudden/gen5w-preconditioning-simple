@@ -1,22 +1,31 @@
-# gen5w-preconditioning
-an app that gives you a manual preconditioning button in your IONIQ 5 or EV6.
+# gen5w-preconditioning-simple
+a simple app that gives you a manual preconditioning button on your EV6, set up for iPhone and CarPlay.
 
 hold the TUNE knob, press **Start**, and Launchpad asks the car to start conditioning the battery. no navigation destination needed.
 
-this app was originally designed to be essentially a replacement for the stock headunit launcher, but it turned out to be kinda useless outside of the preconditioning and wifi settings. those parts are still there if you want them.
+this is a personal fork of [paytondevs/gen5w-preconditioning](https://github.com/paytondevs/gen5w-preconditioning), which is the original work of paytondevs and its contributors. it isn't affiliated with or supported by that project, so please don't take problems with this fork to them.
+
+## what's different in this fork
+
+- Launchpad opens straight to preconditioning, with **Start** selected first on the TUNE knob.
+- the Home tab, its Navigation, Music and Phone shortcuts, and the Default tab setting are gone. Kia's own apps are still under **Advanced → All screens**.
+- the "Launchpad" title and the Car home button are gone, and the tabs are centered. use the car's own home button instead.
+- the Projection shortcut is now **CarPlay**, under **Advanced**. it opens the car's phone connection settings, not CarPlay itself.
+- Launchpad always follows the car's day/night display. the Appearance setting and the Appearance signals panel are gone.
+- the EV6 guide is written for iPhone and CarPlay.
 
 ## will it work on my car?
 
-**check the [compatibility chart](COMPATIBILITY.md#compatibility-chart) first.** it lists every car and head-unit software version Launchpad supports right now. what matters is the head unit's software version, not the model year.
+this fork has been tried on one car: a US Kia EV6 with an iPhone, using CarPlay. other cars and phones may work but are untested with these changes.
 
-your car isn't listed? the chart also explains how to run the **vehicle porting kit**, a USB drive that safely reads your car's details so support can be added.
+Launchpad only runs on the exact cars and head-unit software versions in the [compatibility chart](COMPATIBILITY.md#compatibility-chart). what matters is the head unit's software version, not the model year. to get a new car or software version added, use the [original project](https://github.com/paytondevs/gen5w-preconditioning).
 
 **EV6 owners:** start with the [EV6 installation and everyday-use guide](EV6-QUICK-START.md).
 
 ## before you start
 
 > [!WARNING]
-> This process involves making **unauthorized modifications to the infotainment system of your car.** One wrong move can render it **entirely unusable, leaving you with a very costly repair bill**. Take care to **never delete or modify any files in the car.** If you are unsure about **anything in this document**, don't leave it up to chance! Feel free to DM me on [Twitter](https://x.com/paytondev) or [Reddit](https://reddit.com/u/paytondev) and I'll try to help.
+> This process involves making **unauthorized modifications to the infotainment system of your car.** One wrong move can render it **entirely unusable, leaving you with a very costly repair bill**. Take care to **never delete or modify any files in the car.** If you are unsure about **anything in this document**, don't leave it up to chance! This fork comes with no support, and you use it entirely at your own risk.
 
 if you aren't comfortable modifying the infotainment system of your car, a [hardware mod](https://electroniqbuttons.com/products/ioniq-5-6-ev6-gv60-manual-preconditioning-button-beta-pre-order) exists that replicates this functionality in an easily reversible and safer manner.
 
@@ -45,7 +54,11 @@ once that's done, delete `ota_package.tar` from the drive (or use a different dr
 
 ### 2. put the Launchpad installer on the drive
 
-download **`Launchpad-install-usb.zip`** from the [releases page](../../releases) (the newest one is at the top).
+this fork doesn't publish installers, so you build your own on GitHub. it's free and doesn't need any tools on your computer:
+
+1. fork this repo, then open the **Actions** tab and enable workflows.
+2. choose the **build** workflow, then **Run workflow** on `main`.
+3. when it finishes, open the run and download its artifact. inside is **`Launchpad-install-usb.zip`**.
 
 extract it so its **contents** sit at the **root** of the drive, with nothing else from NEMESIS left on it. the drive should look exactly like this:
 
@@ -100,11 +113,11 @@ you only need the USB drive again to update.
 
 ## using it
 
-1. hold TUNE to open Launchpad and go to preconditioning.
+1. hold TUNE to open Launchpad on the preconditioning screen.
 2. press **Start**. Launchpad shows **Request sent** while it waits for the car to say yes. if the battery is already warm, it asks you first and offers **Start anyway**.
 3. when the car confirms, it shows **Active**. that's the only sign the battery is actually being conditioned. the car can still say no, for example if the battery is warm enough or the charge is too low.
 
-if the car hasn't confirmed after five minutes on the EV6 (two on the IONIQ 5), Launchpad cancels the request for you. an **Active** session is never cut short.
+if the car hasn't confirmed after five minutes on the EV6, Launchpad cancels the request for you. an **Active** session is never cut short.
 
 press **Stop** to cancel, even while it's still waiting. closing Launchpad does **not** stop a request that's already running.
 
@@ -112,7 +125,7 @@ press **Stop** to cancel, even while it's still waiting. closing Launchpad does 
 
 ## updating
 
-exactly the same as installing: put **`Launchpad-install-usb.zip`** from the newest release on the drive, run it, and reboot. if Launchpad is already installed, it updates it in place, and the log says so.
+exactly the same as installing: build a new **`Launchpad-install-usb.zip`** from the latest code, put it on the drive, run it, and reboot. if Launchpad is already installed, it updates it in place, and the log says so.
 
 your favorites and settings are kept. it also works if you installed an older version over ADB. running the drive twice is harmless.
 
@@ -131,10 +144,10 @@ this removes Launchpad and its TUNE shortcut. if you installed an older version 
 | nothing happens when you plug in the drive | make sure `NEMESIS.data` is in the **root** of the drive, not in a folder. check the drive is FAT32/exFAT and in a data port. check NEMESIS is installed (press NAV three times; Manager should open). |
 | "Invalid package descriptor" | the files were edited or copied incompletely. extract the zip again onto the drive. |
 | the dialog says it failed | open `launchpad-install.log` on the drive. for more detail, open NEMESIS Manager → **Logs** → **Copy to USB**, which writes a `NEMESIS-logs` folder to the drive. |
-| "not enough space on /system" in the log | nothing was changed. message me with the log. |
-| holding TUNE doesn't open Launchpad | reboot once more. in NEMESIS Manager → **Services**, `paytondev.launchpad/knobd` should be running. a different headunit may need a different TUNE profile; message me. |
-| preconditioning says **Unavailable** | your car or its software version isn't supported yet, so Launchpad won't send anything to the car. check the [compatibility chart](COMPATIBILITY.md#compatibility-chart). if your car isn't listed, run the [vehicle porting kit](COMPATIBILITY.md#car-not-listed-run-the-vehicle-porting-kit). |
-| it stays **Request sent** | the car hasn't confirmed yet. press **Stop**, or wait: Launchpad cancels it after five minutes on the EV6 (two on the IONIQ 5). **Start** comes back once the car reports Off. |
+| "not enough space on /system" in the log | nothing was changed. keep the log. |
+| holding TUNE doesn't open Launchpad | reboot once more. in NEMESIS Manager → **Services**, `paytondev.launchpad/knobd` should be running. a different headunit may need a different TUNE profile. |
+| preconditioning says **Unavailable** | your car or its software version isn't supported yet, so Launchpad won't send anything to the car. check the [compatibility chart](COMPATIBILITY.md#compatibility-chart). |
+| it stays **Request sent** | the car hasn't confirmed yet. press **Stop**, or wait: Launchpad cancels it after five minutes on the EV6. **Start** comes back once the car reports Off. |
 
 ## what this changes on your car
 
@@ -154,12 +167,11 @@ already use ADB with your car? there are [manual ADB install steps](ADVANCED-ADB
 
 ## building from source
 
-see [BUILDING.md](BUILDING.md). releases are built with `tools/build_apk.sh` and `tools/build_usb_bundles.py`.
-
-want to fix something or add your car? see [CONTRIBUTING.md](CONTRIBUTING.md).
+see [BUILDING.md](BUILDING.md).
 
 ## credits
 
+- Launchpad: [paytondevs](https://github.com/paytondevs) and the contributors to the [original project](https://github.com/paytondevs/gen5w-preconditioning)
 - EV6 development, documentation, and vehicle testing: [Abro86](https://github.com/Abro86), with development, documentation, and host-test assistance from OpenAI Codex.
 - [https://github.com/xwtk/hmg_nemesis](https://github.com/xwtk/hmg_nemesis) - the NEMESIS exploit that made this all possible
 - [https://github.com/tylerharvey/Ioniq5_CAN](https://github.com/tylerharvey/Ioniq5_CAN) - reverse engineered the CAN messages used to start preconditioning

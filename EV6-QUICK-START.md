@@ -1,10 +1,8 @@
 # EV6: install and use manual battery preconditioning
 
-**Release status:** these instructions accompany an EV6 contribution under
-review. Wait for a maintainer release whose notes explicitly include EV6 US
-260507 support and the temperature/timeout improvements described here. The
-existing release downloads may not contain them. This branch does not provide
-a new signed installer.
+**About this guide:** this is for the
+[`gen5w-preconditioning-simple`](https://github.com/mbudden/gen5w-preconditioning-simple)
+fork, set up for an iPhone and CarPlay. It isn't supported by the original project.
 
 ## Check your car first
 
@@ -44,9 +42,8 @@ Launchpad after installation. These are separate shortcuts.
 
 ## 2. Prepare the USB
 
-1. From the maintainer's [release page](https://github.com/paytondevs/ioniq5-preconditioning/releases),
-   choose a release explicitly listing EV6 US 260507 support.
-2. Download **`Launchpad-install-usb.zip`**. The same drive installs Launchpad
+1. Build your own installer by following step 2 of the [README](README.md#2-put-the-launchpad-installer-on-the-drive).
+2. Open the artifact and find **`Launchpad-install-usb.zip`**. The same drive installs Launchpad
    or updates an existing installation; read **Updating** below first if
    Launchpad is already installed.
 3. Use an empty drive, or back up its contents to your computer. Move any old
@@ -181,7 +178,7 @@ it continues waiting instead of claiming success. Keep the logs if this happens.
 
 ## Updating
 
-Use **`Launchpad-install-usb.zip`** from a newer release and follow the
+Build a new **`Launchpad-install-usb.zip`** from the latest code and follow the
 installation steps above, starting with stopping any pending or active session.
 When Launchpad is already installed, the installer updates it in place and keeps
 its settings; `launchpad-install.log` says it updated. Do not clear app data to
