@@ -330,7 +330,7 @@ public final class MainActivity extends Activity {
         Runnable copyAction = new Runnable() { @Override public void run() { copyAddress(); } };
         clickable(copy, copyAction);
         group.addView(ui.divider(true));
-        LinearLayout wifi = ui.button("Wi-Fi settings", R.drawable.ic_wifi, true, 198);
+        LinearLayout wifi = ui.button("Wi-Fi Settings", R.drawable.ic_wifi, true, 198);
         LinearLayout.LayoutParams wifiParams = new LinearLayout.LayoutParams(ui.dp(198), ui.dp(48));
         wifiParams.leftMargin = ui.dp(22); group.addView(wifi, wifiParams);
         addShortcutTarget(wifi, ShortcutSpec.WIFI);
@@ -343,14 +343,14 @@ public final class MainActivity extends Activity {
         listParams.topMargin = ui.dp(12); body.addView(list, listParams);
         LinearLayout carPlay = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
             R.drawable.ic_projection, 0xff9861ff, false);
-        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(78)));
+        list.addView(carPlay, new LinearLayout.LayoutParams(-1, ui.dp(68)));
         addShortcutTarget(carPlay, ShortcutSpec.PROJECTION);
         LinearLayout.LayoutParams carPlaySeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
         carPlaySeparator.leftMargin = ui.dp(24); carPlaySeparator.rightMargin = ui.dp(24);
         list.addView(ui.divider(false), carPlaySeparator);
-        LinearLayout screens = ui.actionRow("All screens", "Browse every available screen",
+        LinearLayout screens = ui.actionRow("All Screens", "Browse every available screen",
             R.drawable.ic_screens, palette.screensIcon, false);
-        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(78)));
+        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(68)));
         addTarget(screens, new Runnable() { @Override public void run() {
             tab = TAB_ALL; showPage(ScreenFlow.Page.BROWSER);
         } });
@@ -360,7 +360,7 @@ public final class MainActivity extends Activity {
         list.addView(separator, separatorParams);
         LinearLayout nemesis = ui.actionRow(ShortcutSpec.NEMESIS.title, ShortcutSpec.NEMESIS.subtitle,
             R.drawable.ic_nemesis, 0xff9861ff, false);
-        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(78)));
+        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(68)));
         addShortcutTarget(nemesis, ShortcutSpec.NEMESIS);
 
         updateConnectionViews();
@@ -524,10 +524,10 @@ public final class MainActivity extends Activity {
         LinearLayout body = ui.column(); content.addView(body, new FrameLayout.LayoutParams(-1, -1));
         LinearLayout browserToolbar = ui.row(); browserToolbar.setGravity(Gravity.CENTER_VERTICAL);
         body.addView(browserToolbar, new LinearLayout.LayoutParams(-1, ui.dp(52)));
-        LinearLayout back = ui.button("All screens", R.drawable.ic_back, false, 180);
+        LinearLayout back = ui.button("All Screens", R.drawable.ic_back, false, 180);
         browserToolbar.addView(back);
         addTarget(back, new Runnable() { @Override public void run() { showPage(ScreenFlow.Page.ADVANCED); } });
-        String[] names = {"Favorites", "Apps", "All screens"};
+        String[] names = {"Favorites", "Apps", "All Screens"};
         for (int i = 0; i < names.length; i++) {
             final int selection = i;
             TextView button = ui.text(names[i], 18, tab == i ? palette.onAccent : palette.ink, false);

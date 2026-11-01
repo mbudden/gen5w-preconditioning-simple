@@ -8,7 +8,7 @@ this is a personal fork of [paytondevs/gen5w-preconditioning](https://github.com
 ## what's different in this fork
 
 - Launchpad opens straight to preconditioning, with **Start** selected first on the TUNE knob.
-- the Home tab, its Navigation, Music and Phone shortcuts, and the Default tab setting are gone. Kia's own apps are still under **Advanced → All screens**.
+- the Home tab, its Navigation, Music and Phone shortcuts, and the Default tab setting are gone. Kia's own apps are still under **Advanced → All Screens**.
 - the "Launchpad" title and the Car home button are gone, and the tabs are centered. use the car's own home button instead.
 - the Projection shortcut is now **CarPlay**, under **Advanced**. it opens the car's phone connection settings, not CarPlay itself.
 - Launchpad always follows the car's day/night display. the Appearance setting and the Appearance signals panel are gone.

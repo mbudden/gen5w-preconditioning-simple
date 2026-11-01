@@ -87,10 +87,10 @@ final class FocusUi {
     }
     LinearLayout actionRow(String title, String subtitle, int resource, int fill, boolean large) {
         LinearLayout row = row(); row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(large ? 8 : 24), dp(10), dp(16), dp(10));
+        row.setPadding(dp(large ? 8 : 24), dp(6), dp(16), dp(6));
         background(row, control(p.card, 16));
-        int iconSize = large ? 84 : 56;
-        row.addView(appIcon(resource, fill, iconSize, large ? 48 : 36),
+        int iconSize = large ? 84 : 48;
+        row.addView(appIcon(resource, fill, iconSize, large ? 48 : 30),
             new LinearLayout.LayoutParams(dp(iconSize), dp(iconSize)));
         LinearLayout labels = column(); labels.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(0, -1, 1);

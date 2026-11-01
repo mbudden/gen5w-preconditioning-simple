@@ -114,7 +114,7 @@ cancellation after five minutes without confirmed activation, as explained below
 - **Preconditioning tab:** Launchpad always opens here, with **Start** selected
   first on the TUNE knob, so pressing TUNE sends the request.
 - **Shortcuts:** **Advanced -> CarPlay** opens the car's phone connection settings.
-  To reach Kia's own apps, use **Advanced -> All screens**.
+  To reach Kia's own apps, use **Advanced -> All Screens**.
 - **Routes:** you do not need a Kia navigation route, so you can keep using your
   usual maps app in CarPlay.
 - **Updating:** wired CarPlay and the USB drive use the same data port, so unplug
