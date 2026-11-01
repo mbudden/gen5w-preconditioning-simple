@@ -61,11 +61,11 @@ control worker. Unbinding removes future polls; a generation check discards
 completions from an earlier binding. Closing the app does not stop a requested
 conditioning session.
 
-Home shows `Battery temp: 61°F`. Advanced shows
-`Lowest Battery Pack Temperature: 61°F (16°C)` and response age. Equal values
+The Preconditioning tab shows the lowest pack reading in both units and its
+response age. Equal values
 still refresh the receipt time. A failed refresh marks the old reading stale
 immediately, and 30 seconds without a successful response also marks it stale.
-Home hides the old number while stale; Advanced retains the number and age.
+The tab mutes the old number while stale and retains it with its age.
 No sample shows checking/unavailable instead of an invented zero.
 
 Receipt age is the app's response time, not a verified vehicle sensor timestamp.

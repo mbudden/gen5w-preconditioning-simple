@@ -101,7 +101,7 @@ You do not need to leave the USB plugged in.
    not guaranteed: the car decides whether temperature, charge, and other
    conditions allow it.
 5. Tap **Stop** to cancel, even while waiting. Wait for **Session ended** and the
-   Advanced screen's **Car indicator: Off** before considering cancellation
+   Preconditioning tab's **Car indicator: Off** before considering cancellation
    confirmed. If it remains unknown or Stop reports an error, retain the logs.
 
 Holding TUNE opens the app; it does not start heating. Closing the app or
@@ -114,12 +114,10 @@ cancellation after five minutes without confirmed activation, as explained below
 - **Opening and closing:** hold TUNE to open Launchpad over CarPlay, and hold it
   again to close it. Closing should drop you back on CarPlay. The EV6 testing
   behind this guide mentions Android Auto, so check this on your own car.
-- **Home tab:** the main tile is preconditioning, with **Start** selected first
-  on the TUNE knob, so pressing TUNE on this tab sends the request. **CarPlay**
-  opens the car's phone connection settings, and **Battery details** opens the
-  preconditioning tab. To reach Kia's own apps, use **Advanced -> All screens**.
-- **Opening on Home:** Launchpad opens on the preconditioning tab by default. To
-  change that, go to **Advanced -> Default tab**.
+- **Preconditioning tab:** Launchpad always opens here, with **Start** selected
+  first on the TUNE knob, so pressing TUNE sends the request.
+- **Shortcuts:** **Advanced -> CarPlay** opens the car's phone connection settings.
+  To reach Kia's own apps, use **Advanced -> All screens**.
 - **Routes:** you do not need a Kia navigation route, so you can keep using your
   usual maps app in CarPlay.
 - **Updating:** wired CarPlay and the USB drive use the same data port, so unplug
@@ -129,17 +127,16 @@ cancellation after five minutes without confirmed activation, as explained below
 
 ## Reading the temperature
 
-- **Home:** `Battery temp: 61°F` is the lowest reported battery-pack sensor
-  temperature, not the outside temperature or the average of all sensors.
-- **Advanced:** `Lowest Battery Pack Temperature: 61°F (16°C)` shows both units
-  and how many seconds ago the app received the response.
+- **Preconditioning tab:** **Lowest pack** shows the lowest reported battery-pack
+  sensor temperature in both units, not the outside temperature or the average of
+  all sensors, and how many seconds ago the app received the response.
 - While Launchpad is open, it asks for a reading roughly every ten seconds. The
   **received ...s ago** counter should reset after successful responses. The
   temperature does not need to change each time. In the field test, the owner
   saw a rise after a little over five minutes of conditioning.
 - **Checking** means the first read is pending. **Unavailable** means no usable
   reading was obtained. **Stale** means the last reading is old or a refresh
-  failed; do not treat it as current. Advanced retains the old value and its age.
+  failed; do not treat it as current. The tab retains the old value and its age.
 
 Temperature polling is intended to stop when you leave Launchpad and resume
 when you reopen it. Builds before 1.3.1 could leave the reading stale after
@@ -205,10 +202,10 @@ NEMESIS installed. If it fails, use **Logs -> Copy to USB** and keep
 | Only "No supported files" and no NEMESIS prompt | Check NEMESIS is installed, the drive uses a data port, and `NEMESIS.data` is at the drive's top level. The media-player message alone does not diagnose NEMESIS. |
 | Install/update reports failure | Keep the USB inserted. Open NEMESIS Manager, then **Logs -> Copy to USB**. Bring it back to the computer and keep `launchpad-install.log` and `NEMESIS-logs`. |
 | Holding TUNE does nothing | Confirm you restarted infotainment after installation. In NEMESIS **Services**, check `paytondev.launchpad/knobd`. Report its status along with your software version. |
-| Preconditioning is Unavailable | Read the reason shown in Advanced. Confirm READY and Battery conditioning mode; a firmware mismatch needs investigation, not disabled compatibility checks. |
+| Preconditioning is Unavailable | Read the reason shown on the Preconditioning tab. Confirm READY and Battery conditioning mode; a firmware mismatch needs investigation, not disabled compatibility checks. |
 | It stays Request sent | The car has not confirmed activation. Tap Stop, or let the five-minute pending timeout request cancellation. Do not assume warmth from this message. |
 | Battery warm appears | No request was sent. Let the ten-second notice reset, or explicitly choose Start anyway. |
-| Battery temp is stale/unavailable | Check Advanced for the response age and retry by leaving and reopening Launchpad. A missing reading is not zero degrees and does not establish that the battery is warm. |
+| Battery temp is stale/unavailable | Check the Preconditioning tab for the response age and retry by leaving and reopening Launchpad. A missing reading is not zero degrees and does not establish that the battery is warm. |
 
 When reporting a problem, include the model/year/market, full software version,
 release name, steps taken, and the relevant error. Review logs before posting

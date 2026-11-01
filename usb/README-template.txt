@@ -28,7 +28,7 @@ ON THE COMPUTER
 IN THE CAR
 1. Park and keep the car on READY. Wait for infotainment to finish starting.
 2. Before updating or uninstalling, Stop any pending or active manual session
-   and confirm Advanced shows Car indicator: Off. Closing Launchpad is not Stop.
+   and confirm the Preconditioning tab shows Car indicator: Off. Closing Launchpad is not Stop.
 3. Unplug your iPhone if it is using the port, then insert the drive into the USB
    DATA port used for wired CarPlay.
 4. Accept the NEMESIS USB execution prompt. If it expires, reinsert the drive.

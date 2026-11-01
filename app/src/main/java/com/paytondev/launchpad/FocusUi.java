@@ -105,25 +105,6 @@ final class FocusUi {
         row.setContentDescription(title + ". " + subtitle);
         return row;
     }
-    LinearLayout homeAction(String title, String subtitle, int resource, int fill) {
-        LinearLayout row = row(); row.setGravity(Gravity.CENTER_VERTICAL);
-        row.setPadding(dp(8), dp(6), dp(8), dp(6));
-        background(row, control(p.background, 16));
-        row.addView(appIcon(resource, fill, 56, 34), new LinearLayout.LayoutParams(dp(56), dp(56)));
-        LinearLayout labels = column(); labels.setGravity(Gravity.CENTER_VERTICAL);
-        TextView heading = text(title, 24, p.ink, true);
-        heading.setSingleLine(true); heading.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        labels.addView(heading);
-        TextView sub = text(subtitle, 16, p.muted, false); sub.setTag("subtitle");
-        sub.setSingleLine(true); sub.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        LinearLayout.LayoutParams subParams = new LinearLayout.LayoutParams(-1, -2); subParams.topMargin = dp(5);
-        labels.addView(sub, subParams);
-        LinearLayout.LayoutParams labelParams = new LinearLayout.LayoutParams(0, -1, 1);
-        labelParams.leftMargin = dp(18); labelParams.rightMargin = dp(8);
-        row.addView(labels, labelParams); row.addView(icon(R.drawable.ic_chevron, 20));
-        row.setContentDescription(title + ". " + subtitle);
-        return row;
-    }
     LinearLayout button(String title, int resource, boolean outlined, int width) {
         LinearLayout row = row(); row.setGravity(Gravity.CENTER);
         row.setPadding(dp(12), 0, dp(12), 0);
