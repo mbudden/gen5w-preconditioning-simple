@@ -290,7 +290,7 @@ public final class MainActivity extends Activity {
         else if (page == ScreenFlow.Page.ADVANCED) buildAdvanced();
         else buildBrowser();
         if (page != ScreenFlow.Page.BROWSER) targets.addAll(headerTargets);
-        knobOnToggle = page == ScreenFlow.Page.PRECONDITIONING;
+        knobOnToggle = showsToggle();
         knobIndex = KnobFocus.next(-1, 1, enabledTargets()); applyKnob();
         restartConnectionTick();
         updatePreconditioningViews();
@@ -321,60 +321,42 @@ public final class MainActivity extends Activity {
     private void buildHome() {
         LinearLayout body = ui.row();
         content.addView(body, new FrameLayout.LayoutParams(-1, -1));
-        FrameLayout navigation = new FrameLayout(this);
-        ui.background(navigation, ui.control(palette.hero, 20));
-        LinearLayout.LayoutParams heroParams = new LinearLayout.LayoutParams(0, -1, 0.57f);
-        body.addView(navigation, heroParams);
-        FrameLayout.LayoutParams glyph = new FrameLayout.LayoutParams(ui.dp(128), ui.dp(128), Gravity.TOP | Gravity.LEFT);
-        glyph.leftMargin = ui.dp(40); glyph.topMargin = ui.dp(36);
-        View navigationIcon = ui.icon(R.drawable.ic_nav, 128);
-        navigationIcon.setRotation(90);
-        navigation.addView(navigationIcon, glyph);
-        LinearLayout labels = ui.column();
-        labels.addView(ui.text("Navigation", compact ? 52 : 64, palette.ink, true));
-        TextView subtitle = ui.text(ShortcutSpec.NAVIGATION.subtitle, 26, palette.muted, false);
-        subtitle.setTag("subtitle");
-        LinearLayout.LayoutParams subtitleParams = new LinearLayout.LayoutParams(-2, -2);
-        subtitleParams.topMargin = ui.dp(9); labels.addView(subtitle, subtitleParams);
-        FrameLayout.LayoutParams labelsParams = new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM | Gravity.LEFT);
-        labelsParams.leftMargin = ui.dp(36); labelsParams.bottomMargin = ui.dp(30);
-        labelsParams.rightMargin = ui.dp(112);
-        navigation.addView(labels, labelsParams);
-        FrameLayout go = ui.appIcon(R.drawable.ic_arrow, palette.accent, 68, 36);
-        ui.background(go, ui.rounded(palette.accent, 34, 0));
-        FrameLayout.LayoutParams goParams = new FrameLayout.LayoutParams(ui.dp(68), ui.dp(68), Gravity.BOTTOM | Gravity.RIGHT);
-        goParams.rightMargin = ui.dp(28); goParams.bottomMargin = ui.dp(28);
-        navigation.addView(go, goParams);
-        addShortcutTarget(navigation, ShortcutSpec.NAVIGATION);
-        navigation.setContentDescription("Navigation. Choose a destination");
+        LinearLayout hero = ui.column();
+        hero.setPadding(ui.dp(32), ui.dp(24), ui.dp(32), ui.dp(24));
+        ui.background(hero, ui.rounded(palette.hero, 20, 0));
+        body.addView(hero, new LinearLayout.LayoutParams(0, -1, 0.57f));
+        LinearLayout heading = ui.row(); heading.setGravity(Gravity.CENTER_VERTICAL);
+        heading.addView(ui.appIcon(R.drawable.ic_preconditioning, 0xffffa623, 72, 44),
+            new LinearLayout.LayoutParams(ui.dp(72), ui.dp(72)));
+        TextView title = ui.text("Preconditioning", compact ? 40 : 52, palette.ink, true);
+        title.setSingleLine(true); title.setEllipsize(TextUtils.TruncateAt.END);
+        LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(0, -2, 1);
+        titleParams.leftMargin = ui.dp(20); heading.addView(title, titleParams);
+        hero.addView(heading);
+        preconditionStatus = ui.text("Checking vehicle services", 26, palette.ink, false);
+        preconditionStatus.setMaxLines(2); preconditionStatus.setEllipsize(TextUtils.TruncateAt.END);
+        hero.addView(preconditionStatus, below(16));
+        preconditionTemperature = ui.text("Battery temp: checking…", 22, palette.muted, false);
+        preconditionTemperature.setSingleLine(true);
+        preconditionTemperature.setEllipsize(TextUtils.TruncateAt.END);
+        hero.addView(preconditionTemperature, below(8));
+        hero.addView(new View(this), new LinearLayout.LayoutParams(-1, 0, 1));
+        // Added first so the toggle is the first TUNE target, as on the preconditioning tab.
+        preconditionButton = preconditioningButton();
+        hero.addView(preconditionButton, new LinearLayout.LayoutParams(ui.dp(compact ? 220 : 260), ui.dp(72)));
 
         LinearLayout actions = ui.column();
         LinearLayout.LayoutParams actionsParams = new LinearLayout.LayoutParams(0, -1, 0.43f);
         actionsParams.leftMargin = ui.dp(28); body.addView(actions, actionsParams);
-        ShortcutSpec[] specs = {ShortcutSpec.MUSIC, ShortcutSpec.PHONE, ShortcutSpec.PROJECTION};
-        int[] icons = {R.drawable.ic_music, R.drawable.ic_phone, R.drawable.ic_projection};
-        int[] colors = {0xffff6175, 0xff22c967, 0xff9861ff};
-        for (int i = 0; i < specs.length; i++) {
-            LinearLayout row = ui.homeAction(specs[i].title, specs[i].subtitle, icons[i], colors[i]);
-            actions.addView(row, new LinearLayout.LayoutParams(-1, 0, 1));
-            addShortcutTarget(row, specs[i]);
-            actions.addView(ui.divider(false));
-        }
-        LinearLayout precondition = ui.homeAction("Preconditioning", "Checking vehicle services",
+        LinearLayout carPlay = ui.homeAction(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
+            R.drawable.ic_projection, 0xff9861ff);
+        actions.addView(carPlay, new LinearLayout.LayoutParams(-1, 0, 1));
+        addShortcutTarget(carPlay, ShortcutSpec.PROJECTION);
+        actions.addView(ui.divider(false));
+        LinearLayout details = ui.homeAction("Battery details", "Temperature and chart",
             R.drawable.ic_preconditioning, 0xffffa623);
-        // Give the action its own focus target, independent of the read-only labels.
-        precondition.removeViewAt(precondition.getChildCount() - 1);
-        preconditionStatus = (TextView) precondition.findViewWithTag("subtitle");
-        preconditionTemperature = ui.text("Battery temp: checking…", 14, palette.muted, false);
-        preconditionTemperature.setSingleLine(true);
-        preconditionTemperature.setEllipsize(TextUtils.TruncateAt.END);
-        ((LinearLayout) preconditionStatus.getParent()).addView(preconditionTemperature);
-        // The row opens the tab; add it before the button so the button's knob state wins.
-        precondition.setContentDescription("Preconditioning. Open the preconditioning tab");
-        addTarget(precondition, new Runnable() { @Override public void run() { showPage(ScreenFlow.Page.PRECONDITIONING); } });
-        preconditionButton = preconditioningButton();
-        precondition.addView(preconditionButton, new LinearLayout.LayoutParams(ui.dp(82), ui.dp(44)));
-        actions.addView(precondition, new LinearLayout.LayoutParams(-1, 0, 1));
+        actions.addView(details, new LinearLayout.LayoutParams(-1, 0, 1));
+        addTarget(details, new Runnable() { @Override public void run() { showPage(ScreenFlow.Page.PRECONDITIONING); } });
     }
 
     private void buildAdvanced() {
@@ -519,9 +501,8 @@ public final class MainActivity extends Activity {
         ui.background(chip, ui.control(selected ? palette.accent : idle, 24));
     }
     private TextView preconditioningButton() {
-        TextView button = ui.text("Start", 18, palette.onAccent, true);
+        TextView button = ui.text("Start", 26, palette.onAccent, true);
         button.setGravity(Gravity.CENTER);
-        ui.background(button, ui.control(palette.accent, 22));
         addTarget(button, new Runnable() { @Override public void run() { preconditioningAction(); } });
         button.setEnabled(false); return button;
     }
@@ -549,9 +530,7 @@ public final class MainActivity extends Activity {
         preconditionDetail.setMaxLines(6);
         LinearLayout.LayoutParams detailParams = new LinearLayout.LayoutParams(-1, 0, 1); detailParams.topMargin = ui.dp(14);
         control.addView(preconditionDetail, detailParams);
-        preconditionButton = ui.text("Start", 26, palette.onAccent, true); preconditionButton.setGravity(Gravity.CENTER);
-        addTarget(preconditionButton, new Runnable() { @Override public void run() { preconditioningAction(); } });
-        preconditionButton.setEnabled(false);
+        preconditionButton = preconditioningButton();
         control.addView(preconditionButton, new LinearLayout.LayoutParams(ui.dp(compact ? 220 : 260), ui.dp(72)));
 
         LinearLayout temperature = panel(body, 0.40f, 16);
@@ -607,6 +586,8 @@ public final class MainActivity extends Activity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-2, -2); params.topMargin = ui.dp(margin); return params;
     }
 
+    private boolean showsToggle() { return page == ScreenFlow.Page.PRECONDITIONING || page == ScreenFlow.Page.HOME; }
+
     private void updatePreconditioningViews() {
         if (preconditionStatus == null) return;
         long now = SystemClock.elapsedRealtime();
@@ -621,17 +602,16 @@ public final class MainActivity extends Activity {
         if (lowestValue != null) updateTemperatureViews(now);
         if (preconditionButton != null) {
             boolean warm = preconditioning.state == PreconditioningSnapshot.State.WARM;
-            boolean toggle = page == ScreenFlow.Page.PRECONDITIONING;
-            preconditionButton.setText(warm ? toggle ? "Start anyway" : "Start\nanyway" : preconditioning.requested ? "Stop" : "Start");
-            preconditionButton.setTextSize(toggle ? warm ? 22 : 26 : warm ? 14 : 18);
+            preconditionButton.setText(warm ? "Start anyway" : preconditioning.requested ? "Stop" : "Start");
+            preconditionButton.setTextSize(warm ? 22 : 26);
             preconditionButton.setContentDescription(warm ? "Start preconditioning anyway" : preconditioning.requested ? "Stop preconditioning" : "Start preconditioning");
             int color = preconditioning.requested ? STOP_RED : warm ? TemperatureGauge.WARM : palette.accent;
-            if (toggle && color != toggleColor) { toggleColor = color; ui.background(preconditionButton, ui.pill(color, 36)); }
+            if (color != toggleColor) { toggleColor = color; ui.background(preconditionButton, ui.pill(color, 36)); }
             boolean enabled = preconditioning.canStart || preconditioning.canStop;
             preconditionButton.setEnabled(enabled); preconditionButton.setAlpha(enabled ? 1f : 0.4f);
             if (knobIndex >= 0 && knobIndex < targets.size() && !targets.get(knobIndex).enabled()) moveKnob(1);
-            // The toggle is the first target on its tab.
-            if (toggle && enabled && knobOnToggle && knobIndex != 0) { knobIndex = 0; applyKnob(); }
+            // The toggle is the first target on both pages that show it.
+            if (enabled && knobOnToggle && knobIndex != 0) { knobIndex = 0; applyKnob(); }
         }
     }
     private void updateTemperatureViews(long now) {
@@ -875,7 +855,7 @@ public final class MainActivity extends Activity {
         if (code == KEY_TUNE_UP || code == KEY_TUNE_DOWN || code == KeyEvent.KEYCODE_DPAD_RIGHT || code == KeyEvent.KEYCODE_DPAD_LEFT) {
             if (down) {
                 moveKnob(code == KEY_TUNE_UP || code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1);
-                knobOnToggle = page == ScreenFlow.Page.PRECONDITIONING && knobIndex == 0;
+                knobOnToggle = showsToggle() && knobIndex == 0;
             }
             return true;
         }
