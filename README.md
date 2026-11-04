@@ -9,9 +9,8 @@ Hold the TUNE knob, press **Start**, and the app asks the car to start condition
 | Light | Dark |
 | --- | --- |
 | ![Preconditioning screen in light mode](docs/previews/preconditioning-light.png) | ![Preconditioning screen in dark mode](docs/previews/preconditioning-dark.png) |
-| ![Advanced screen in light mode](docs/previews/advanced-light.png) | ![Advanced screen in dark mode](docs/previews/advanced-dark.png) |
 
-These screenshots are from a slightly earlier build, so some labels and details differ. Network details are hidden.
+These screenshots are from an earlier build. The tabs at the top are gone now, so the screen has more room.
 
 ## What it is
 
@@ -24,7 +23,7 @@ These screenshots are from a slightly earlier build, so some labels and details 
 
 - **It is not made or supported by Kia or Hyundai.**
 - **It is not supported by the original project.** It isn't affiliated with paytondevs, so please don't take problems with this fork to them. This fork also comes with no support of its own.
-- **It is not a phone projection app.** It doesn't appear inside phone projection, and it can't open a projection session directly. The **Phone Projection** shortcut opens the car's phone connection settings.
+- **It is not a phone projection app.** It doesn't appear inside phone projection, and it can't open a projection session directly.
 - **It is not a launcher or a replacement for Kia's home screen.** The original project's Home tab and shortcuts have been removed.
 - **It is not a heater control.** It doesn't send raw CAN commands or override anything. The car's battery system decides whether to start, and it can say no.
 - **It is not a guarantee of faster charging.** **Active** only means the car reports that conditioning is running.
@@ -34,9 +33,9 @@ These screenshots are from a slightly earlier build, so some labels and details 
 ## What's different in this fork
 
 - Launchpad opens straight to the preconditioning screen.
-- The Home tab, its Navigation, Music and Phone shortcuts, and the Default tab setting are gone. Kia's own apps are still available under **Advanced → All Screens**.
-- The "Launchpad" title and the **Car home** button are gone, and the tabs are centered. Use the car's own home button instead.
-- The Projection shortcut is now **Phone Projection**, and it has moved to **Advanced**.
+- It has one screen. The Home and Advanced tabs are gone, along with their shortcuts, app browser, Wi-Fi details and the Default tab setting.
+- The "Launchpad" title and the **Car home** button are gone. Use the car's own home button instead.
+- The app no longer has any Wi-Fi permission. Use the car's own menus for phone projection and Kia's apps.
 - Launchpad always follows the car's Day/Night display. The Appearance setting and the Appearance signals panel are gone.
 - The Battery warm message is shorter, and several labels and layouts have been tidied up.
 
@@ -155,7 +154,7 @@ Press **Stop** to cancel, even while Launchpad is still waiting. Closing Launchp
 
 Updating works the same way as installing. Build a new **`Launchpad-install-usb.zip`** from the latest code, put it on the drive, run it, and reboot. If Launchpad is already installed, the installer updates it in place, and the log says so.
 
-Your favorites and settings are kept. Updating also works if you installed an older version over ADB, and running the drive twice is harmless.
+Updating also works if you installed an older version over ADB, and running the drive twice is harmless.
 
 ## Uninstalling
 

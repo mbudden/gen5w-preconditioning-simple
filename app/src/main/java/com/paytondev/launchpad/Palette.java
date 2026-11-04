@@ -9,19 +9,19 @@ final class Palette {
     final int ink, muted, secondary;
     /** Accent fill, text on it, accent-colored text, and its pressed / knob-activated tints. */
     final int accent, onAccent, link, pressed, activated;
-    /** Navigation hero, the copy button, the All Screens icon, and the idle status dot. */
-    final int hero, quiet, screensIcon, idle;
+    /** Navigation hero. */
+    final int hero;
     /** Gauge track below and above the warm threshold. */
     final int coldTrack, warmTrack;
 
     private Palette(boolean dark, int background, int surface, int card, int line, int ink, int muted,
                     int secondary, int accent, int onAccent, int link, int pressed, int activated, int hero,
-                    int quiet, int screensIcon, int idle, int coldTrack, int warmTrack) {
+                    int coldTrack, int warmTrack) {
         this.dark = dark; this.background = background; this.surface = surface; this.card = card;
         this.line = line; this.ink = ink; this.muted = muted; this.secondary = secondary;
         this.accent = accent; this.onAccent = onAccent; this.link = link;
         this.pressed = pressed; this.activated = activated;
-        this.hero = hero; this.quiet = quiet; this.screensIcon = screensIcon; this.idle = idle;
+        this.hero = hero;
         this.coldTrack = coldTrack; this.warmTrack = warmTrack;
     }
 
@@ -29,13 +29,13 @@ final class Palette {
         0xffffffff, 0xfff0f2f6, 0xffffffff, 0xffdfe3ea,
         0xff101522, 0xff677388, 0xff45536a,
         0xff007aff, 0xffffffff, 0xff007aff, 0xffe7f0ff, 0xffd9eaff,
-        0xffe8f2ff, 0xfff8f9fb, 0xffd5f0ff, 0xffa0a7b2,
+        0xffe8f2ff,
         0xffd5e6ff, 0xffffe7bf);
     static final Palette DARK = new Palette(true,
         0xff0b0f17, 0xff161c27, 0xff1f2733, 0xff2a3242,
         0xffe8ecf3, 0xff97a1b3, 0xffc3cad6,
         0xff2678eb, 0xffffffff, 0xff6aaeff, 0xff1d3150, 0xff1a2d4a,
-        0xff14243b, 0xff1f2733, 0xffd5f0ff, 0xff6b7486,
+        0xff14243b,
         0xff1d3352, 0xff4a3714);
 
     static Palette of(boolean dark) { return dark ? DARK : LIGHT; }

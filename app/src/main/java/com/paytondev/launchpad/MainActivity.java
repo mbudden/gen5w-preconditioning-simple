@@ -1,25 +1,12 @@
 package com.paytondev.launchpad;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.ServiceConnection;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.graphics.drawable.ColorDrawable;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Handler;
@@ -30,41 +17,24 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ScrollView;
-import android.widget.Toast;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-/** APK-contained touch and TUNE launcher; the external hold service is unchanged. */
+/** The preconditioning screen, with touch and TUNE control; the external hold service is unchanged. */
 public final class MainActivity extends Activity {
     static final String EXTRA_FROM_KNOB = "from_knob";
-    private static final int TAB_FAVORITES = 0, TAB_APPS = 1, TAB_ALL = 2;
     private static final int KEY_TUNE_UP = keyCode("KEYCODE_TUNE_UP", 223);
     private static final int KEY_TUNE_DOWN = keyCode("KEYCODE_TUNE_DOWN", 224);
     private static final int KEY_TUNE_ENTER = keyCode("KEYCODE_TUNE_ENTER", 243);
-    private static final String[] TAB_TITLES = {"Preconditioning", "Advanced"};
     private static final int STOP_RED = 0xffe5484d;
     private final Handler main = new Handler(Looper.getMainLooper());
     private final List<Target> targets = new ArrayList<>();
-    private final List<Target> headerTargets = new ArrayList<>();
     private FocusUi ui;
-    private LinearLayout toolbar;
     private FrameLayout content;
-    private Favorites favorites;
-    private SharedPreferences prefs;
-    private TileAdapter adapter;
-    private GridView grid;
-    private TextView empty, statusText, networkText, ipText, adbText;
-    private View statusDot, copyButton;
     private TextView preconditionStatus, preconditionDetail, preconditionElapsed, preconditionButton;
     private TextView lowestValue, lowestCelsius, highestValue, temperatureAge;
     private View highestColumn, failureRow;
@@ -72,7 +42,6 @@ public final class MainActivity extends Activity {
     private TemperatureChart chart;
     private final CheckMark[] checkMarks = new CheckMark[6];
     private final TextView[] checkValues = new TextView[6];
-    private ScrollView advancedScroll;
     private Palette palette = Palette.LIGHT;
     private boolean carNight, compact, splitObserved;
     private int rightPadding;
@@ -81,40 +50,19 @@ public final class MainActivity extends Activity {
     private BatteryTemperatureReading batteryTemperature = BatteryTemperatureReading.checking();
     private TemperatureHistory.Trace history = TemperatureHistory.Trace.EMPTY;
     private boolean vehicleBound;
-    private ConnectionSnapshot connection = ConnectionSnapshot.unknown();
-    private ScreenFlow.Page page = ScreenFlow.Page.PRECONDITIONING;
-    private int tab = TAB_ALL, knobIndex = -1, connectionEpoch, toggleColor;
+    private int knobIndex = -1, toggleColor;
     private long resumedAt, enterAt;
-    private boolean resumed, started, enterDown, enterLong, preview, receiverRegistered, connectionReading;
-    /** The toggle keeps the knob while it is briefly disabled, until TUNE is turned away. */
-    private boolean knobOnToggle;
+    private boolean resumed, started, enterDown, enterLong;
 
     private static final class Target {
         final View view;
-        final int gridPosition;
         final Runnable action;
-        boolean available = true;
-        Target(View view, int gridPosition, Runnable action) {
-            this.view = view; this.gridPosition = gridPosition; this.action = action;
-        }
-        boolean enabled() { return available && (view == null || view.isEnabled()); }
+        Target(View view, Runnable action) { this.view = view; this.action = action; }
+        boolean enabled() { return view.isEnabled(); }
     }
 
-    private final Runnable connectionTick = new Runnable() {
-        @Override public void run() {
-            if (resumed && page == ScreenFlow.Page.ADVANCED) {
-                refreshConnection();
-                main.postDelayed(this, 5000);
-            }
-        }
-    };
     private final ContentObserver splitChanges = new ContentObserver(main) {
         @Override public void onChange(boolean selfChange) { applySplitScreen(); }
-    };
-    private final BroadcastReceiver wifiChanges = new BroadcastReceiver() {
-        @Override public void onReceive(Context context, Intent intent) {
-            if (resumed && page == ScreenFlow.Page.ADVANCED) refreshConnection();
-        }
     };
     private final ServiceConnection vehicleConnection = new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder binder) {
@@ -143,29 +91,13 @@ public final class MainActivity extends Activity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_focus);
-        toolbar = (LinearLayout) findViewById(R.id.focus_toolbar);
         content = (FrameLayout) findViewById(R.id.focus_content);
-        prefs = getSharedPreferences("launchpad", MODE_PRIVATE);
-        favorites = new Favorites(this);
-        adapter = new TileAdapter(getLayoutInflater(), favorites);
         carNight = DisplaySignals.night(this, getResources().getConfiguration());
         palette = Palette.of(carNight);
-        ui = new FocusUi(this, palette); adapter.setUi(ui); applyWindowColors();
+        ui = new FocusUi(this, palette); applyWindowColors();
         rightPadding = findViewById(R.id.focus_root).getPaddingRight();
         compact = splitScreenOn(); applySplitPadding();
-        preview = PreviewData.enabled(getIntent());
-        showPage(ScreenFlow.Page.PRECONDITIONING);
-        final Context app = getApplicationContext();
-        new Thread(new Runnable() {
-            @Override public void run() {
-                AppCatalog.load(app);
-                main.post(new Runnable() {
-                    @Override public void run() {
-                        if (!isFinishing() && page == ScreenFlow.Page.BROWSER) renderBrowser();
-                    }
-                });
-            }
-        }, "launchpad-catalog").start();
+        showScreen();
     }
 
     @Override protected void onStart() {
@@ -186,17 +118,11 @@ public final class MainActivity extends Activity {
             splitObserved = true;
         } catch (SecurityException e) { splitObserved = false; }
         applySplitScreen();
-        IntentFilter filter = new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION);
-        filter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-        try { registerReceiver(wifiChanges, filter); receiverRegistered = true; }
-        catch (SecurityException e) { receiverRegistered = false; }
-        restartConnectionTick();
         main.removeCallbacks(preconditioningTick); preconditioningTick.run();
     }
     @Override protected void onPause() {
-        resumed = false; connectionEpoch++; main.removeCallbacks(connectionTick);
+        resumed = false;
         main.removeCallbacks(preconditioningTick);
-        if (receiverRegistered) { unregisterReceiver(wifiChanges); receiverRegistered = false; }
         if (splitObserved) { getContentResolver().unregisterContentObserver(splitChanges); splitObserved = false; }
         super.onPause();
     }
@@ -208,16 +134,12 @@ public final class MainActivity extends Activity {
         super.onConfigurationChanged(configuration);
         carNight = DisplaySignals.night(this, configuration); applyAppearance();
     }
-    /** Rebuilds the current page in the resolved palette, keeping the TUNE selection. */
+    /** Rebuilds the screen in the resolved palette. */
     private void applyAppearance() {
         Palette next = Palette.of(carNight);
         if (next == palette) return;
-        palette = next; ui = new FocusUi(this, palette); adapter.setUi(ui); applyWindowColors();
-        rebuildPage();
-    }
-    private void rebuildPage() {
-        int knob = knobIndex; showPage(page);
-        if (knob >= 0 && knob < targets.size() && targets.get(knob).enabled()) { knobIndex = knob; applyKnob(); }
+        palette = next; ui = new FocusUi(this, palette); applyWindowColors();
+        showScreen();
     }
     private boolean splitScreenOn() {
         try { return SplitScreen.on(Settings.System.getInt(getContentResolver(), SplitScreen.SETTING, 0)); }
@@ -227,7 +149,7 @@ public final class MainActivity extends Activity {
     private void applySplitScreen() {
         boolean next = splitScreenOn();
         if (next == compact) return;
-        compact = next; applySplitPadding(); rebuildPage();
+        compact = next; applySplitPadding(); showScreen();
     }
     private void applySplitPadding() {
         View root = findViewById(R.id.focus_root);
@@ -245,132 +167,14 @@ public final class MainActivity extends Activity {
         if (intent.getBooleanExtra(EXTRA_FROM_KNOB, false) && started
             && SystemClock.uptimeMillis() - resumedAt > 700) finish();
     }
-    @Override public void onBackPressed() {
-        ScreenFlow.Page previous = ScreenFlow.back(page);
-        if (previous == null) finish(); else showPage(previous);
-    }
-
-    private void showPage(ScreenFlow.Page next) {
-        // A day/night rebuild of Advanced keeps the log: that switch is what it records.
-        page = next; connectionEpoch++;
-        targets.clear(); headerTargets.clear(); grid = null;
-        advancedScroll = null;
-        preconditionStatus = null; preconditionDetail = null; preconditionButton = null;
-        preconditionElapsed = null;
-        lowestValue = null; lowestCelsius = null; highestValue = null; temperatureAge = null;
-        highestColumn = null; failureRow = null; gauge = null; chart = null; toggleColor = 0;
-        Arrays.fill(checkMarks, null); Arrays.fill(checkValues, null);
-        content.removeAllViews(); toolbar.removeAllViews();
-        buildToolbar();
-        if (page == ScreenFlow.Page.PRECONDITIONING) buildPreconditioning();
-        else if (page == ScreenFlow.Page.ADVANCED) buildAdvanced();
-        else buildBrowser();
-        if (page != ScreenFlow.Page.BROWSER) targets.addAll(headerTargets);
-        knobOnToggle = page == ScreenFlow.Page.PRECONDITIONING;
+    private void showScreen() {
+        targets.clear(); toggleColor = 0;
+        content.removeAllViews();
+        buildPreconditioning();
         knobIndex = KnobFocus.next(-1, 1, enabledTargets()); applyKnob();
-        restartConnectionTick();
         updatePreconditioningViews();
     }
 
-    private void buildToolbar() {
-        // The root's left and right padding differ; even them out to center on the visible screen.
-        toolbar.setPadding(compact ? 0 : ui.dp(32), 0, compact ? ui.dp(32) : 0, 0);
-        LinearLayout segmented = ui.row(); segmented.setPadding(ui.dp(4), ui.dp(4), ui.dp(4), ui.dp(4));
-        ui.background(segmented, ui.rounded(palette.surface, 28, 0));
-        ScreenFlow.Page current = page == ScreenFlow.Page.BROWSER ? ScreenFlow.Page.ADVANCED : page;
-        for (int i = 0; i < ScreenFlow.TABS.length; i++) {
-            final ScreenFlow.Page destination = ScreenFlow.TABS[i];
-            TextView chip = chip(TAB_TITLES[i], destination == current, palette.surface);
-            segmented.addView(chip, new LinearLayout.LayoutParams(ui.dp(i == 0 ? 170 : 128), ui.dp(40)));
-            Runnable action = new Runnable() { @Override public void run() { showPage(destination); } };
-            clickable(chip, action); headerTargets.add(new Target(chip, -1, action));
-        }
-        toolbar.addView(segmented);
-    }
-
-    private void buildAdvanced() {
-        advancedScroll = new ScrollView(this); advancedScroll.setFillViewport(true);
-        content.addView(advancedScroll, new FrameLayout.LayoutParams(-1, -1));
-        LinearLayout body = ui.column();
-        advancedScroll.addView(body, new ScrollView.LayoutParams(-1, -2));
-        LinearLayout group = ui.row(); group.setGravity(Gravity.CENTER_VERTICAL);
-        group.setPadding(ui.dp(24), ui.dp(8), ui.dp(18), ui.dp(8));
-        ui.background(group, ui.rounded(palette.surface, 20, 0));
-        body.addView(group, new LinearLayout.LayoutParams(-1, ui.dp(64)));
-        LinearLayout network = ui.row(); network.setGravity(Gravity.CENTER_VERTICAL);
-        statusDot = new View(this); ui.background(statusDot, ui.rounded(palette.idle, 6, 0));
-        network.addView(statusDot, new LinearLayout.LayoutParams(ui.dp(16), ui.dp(16)));
-        LinearLayout networkLabels = ui.column();
-        statusText = ui.text("Checking Wi-Fi", 20, palette.ink, true);
-        networkText = ui.text("Unavailable", 14, palette.muted, false);
-        networkText.setSingleLine(true); networkText.setEllipsize(TextUtils.TruncateAt.END);
-        networkLabels.addView(statusText);
-        LinearLayout.LayoutParams sub = new LinearLayout.LayoutParams(-1, -2); sub.topMargin = ui.dp(4);
-        networkLabels.addView(networkText, sub);
-        LinearLayout.LayoutParams networkLabelParams = new LinearLayout.LayoutParams(0, -2, 1);
-        networkLabelParams.leftMargin = ui.dp(18); network.addView(networkLabels, networkLabelParams);
-        group.addView(network, new LinearLayout.LayoutParams(0, -1, 0.31f));
-        group.addView(ui.divider(true));
-        LinearLayout ip = detailColumn("IP address", false);
-        ipText = (TextView) ip.findViewWithTag("value");
-        group.addView(ip, new LinearLayout.LayoutParams(0, -1, 0.22f)); group.addView(ui.divider(true));
-        LinearLayout adbGroup = ui.row(); adbGroup.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout adbColumn = detailColumn("ADB address", true);
-        adbText = (TextView) adbColumn.findViewWithTag("value");
-        adbGroup.addView(adbColumn, new LinearLayout.LayoutParams(0, -1, 1));
-        FrameLayout copy = ui.appIcon(R.drawable.ic_copy, palette.quiet, 40, 23);
-        ui.background(copy, ui.control(palette.quiet, 12));
-        copyButton = copy; copyButton.setContentDescription("Copy ADB address"); copyButton.setEnabled(false);
-        adbGroup.addView(copy, new LinearLayout.LayoutParams(ui.dp(40), ui.dp(40)));
-        LinearLayout.LayoutParams adbParams = new LinearLayout.LayoutParams(0, -1, 0.36f);
-        adbParams.rightMargin = ui.dp(20); group.addView(adbGroup, adbParams);
-        Runnable copyAction = new Runnable() { @Override public void run() { copyAddress(); } };
-        clickable(copy, copyAction);
-        group.addView(ui.divider(true));
-        LinearLayout wifi = ui.button("Wi-Fi Settings", R.drawable.ic_wifi, true, 198);
-        LinearLayout.LayoutParams wifiParams = new LinearLayout.LayoutParams(ui.dp(198), ui.dp(48));
-        wifiParams.leftMargin = ui.dp(22); group.addView(wifi, wifiParams);
-        addShortcutTarget(wifi, ShortcutSpec.WIFI);
-        targets.add(new Target(copyButton, -1, copyAction));
-
-        LinearLayout list = ui.column();
-        ui.background(list, ui.rounded(palette.card, 17, palette.line));
-        list.setPadding(ui.dp(2), ui.dp(2), ui.dp(2), ui.dp(2));
-        LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(-1, -2);
-        listParams.topMargin = ui.dp(12); body.addView(list, listParams);
-        LinearLayout projection = ui.actionRow(ShortcutSpec.PROJECTION.title, ShortcutSpec.PROJECTION.subtitle,
-            R.drawable.ic_projection, 0xff9861ff, false);
-        list.addView(projection, new LinearLayout.LayoutParams(-1, ui.dp(74)));
-        addShortcutTarget(projection, ShortcutSpec.PROJECTION);
-        LinearLayout.LayoutParams projectionSeparator = new LinearLayout.LayoutParams(-1, ui.dp(1));
-        projectionSeparator.leftMargin = ui.dp(24); projectionSeparator.rightMargin = ui.dp(24);
-        list.addView(ui.divider(false), projectionSeparator);
-        LinearLayout screens = ui.actionRow("All Screens", "Browse every available screen",
-            R.drawable.ic_screens, palette.screensIcon, false);
-        list.addView(screens, new LinearLayout.LayoutParams(-1, ui.dp(74)));
-        addTarget(screens, new Runnable() { @Override public void run() {
-            tab = TAB_ALL; showPage(ScreenFlow.Page.BROWSER);
-        } });
-        View separator = ui.divider(false);
-        LinearLayout.LayoutParams separatorParams = new LinearLayout.LayoutParams(-1, ui.dp(1));
-        separatorParams.leftMargin = ui.dp(24); separatorParams.rightMargin = ui.dp(24);
-        list.addView(separator, separatorParams);
-        LinearLayout nemesis = ui.actionRow(ShortcutSpec.NEMESIS.title, ShortcutSpec.NEMESIS.subtitle,
-            R.drawable.ic_nemesis, 0xff9861ff, false);
-        list.addView(nemesis, new LinearLayout.LayoutParams(-1, ui.dp(74)));
-        addShortcutTarget(nemesis, ShortcutSpec.NEMESIS);
-
-        updateConnectionViews();
-    }
-
-    private TextView chip(String label, boolean selected, int idle) {
-        TextView chip = ui.text(label, 17, palette.ink, false); chip.setGravity(Gravity.CENTER);
-        styleChip(chip, selected, idle); return chip;
-    }
-    private void styleChip(TextView chip, boolean selected, int idle) {
-        chip.setTextColor(selected ? palette.onAccent : palette.ink);
-        ui.background(chip, ui.control(selected ? palette.accent : idle, 24));
-    }
     private TextView preconditioningButton() {
         TextView button = ui.text("Start", 26, palette.onAccent, true);
         button.setGravity(Gravity.CENTER);
@@ -479,8 +283,8 @@ public final class MainActivity extends Activity {
             boolean enabled = preconditioning.canStart || preconditioning.canStop;
             preconditionButton.setEnabled(enabled); preconditionButton.setAlpha(enabled ? 1f : 0.4f);
             if (knobIndex >= 0 && knobIndex < targets.size() && !targets.get(knobIndex).enabled()) moveKnob(1);
-            // The toggle is the first target on its tab.
-            if (enabled && knobOnToggle && knobIndex != 0) { knobIndex = 0; applyKnob(); }
+            // The toggle is the only target, so it takes the knob as soon as it can be used.
+            if (enabled && knobIndex != 0) { knobIndex = 0; applyKnob(); }
         }
     }
     private void updateTemperatureViews(long now) {
@@ -510,115 +314,8 @@ public final class MainActivity extends Activity {
         checkMarks[index].setState(state); checkValues[index].setText(value);
     }
 
-    private LinearLayout detailColumn(String title, boolean compact) {
-        LinearLayout column = ui.column(); column.setGravity(Gravity.CENTER_VERTICAL);
-        column.setPadding(ui.dp(compact ? 24 : 32), 0, ui.dp(12), 0);
-        column.addView(ui.text(title, 14, palette.muted, false));
-        TextView value = ui.text("—", 20, palette.ink, true); value.setTag("value"); value.setSingleLine(true);
-        value.setEllipsize(TextUtils.TruncateAt.END);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2); params.topMargin = ui.dp(4);
-        column.addView(value, params); return column;
-    }
-
-    private void buildBrowser() {
-        LinearLayout body = ui.column(); content.addView(body, new FrameLayout.LayoutParams(-1, -1));
-        LinearLayout browserToolbar = ui.row(); browserToolbar.setGravity(Gravity.CENTER_VERTICAL);
-        body.addView(browserToolbar, new LinearLayout.LayoutParams(-1, ui.dp(52)));
-        LinearLayout back = ui.button("All Screens", R.drawable.ic_back, false, 180);
-        browserToolbar.addView(back);
-        addTarget(back, new Runnable() { @Override public void run() { showPage(ScreenFlow.Page.ADVANCED); } });
-        String[] names = {"Favorites", "Apps", "All Screens"};
-        for (int i = 0; i < names.length; i++) {
-            final int selection = i;
-            TextView button = ui.text(names[i], 18, tab == i ? palette.onAccent : palette.ink, false);
-            button.setGravity(Gravity.CENTER);
-            ui.background(button, ui.control(tab == i ? palette.accent : palette.surface, 22));
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ui.dp(compact ? 136 : 156), ui.dp(44));
-            params.leftMargin = ui.dp(12); browserToolbar.addView(button, params);
-            addTarget(button, new Runnable() { @Override public void run() {
-                tab = selection; prefs.edit().putInt("tab", tab).apply(); showPage(ScreenFlow.Page.BROWSER);
-            } });
-        }
-        TextView hint = ui.text("Hold an app to favorite", 14, palette.muted, false);
-        hint.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
-        browserToolbar.addView(hint, new LinearLayout.LayoutParams(0, -1, 1));
-        FrameLayout list = new FrameLayout(this);
-        LinearLayout.LayoutParams listParams = new LinearLayout.LayoutParams(-1, 0, 1);
-        listParams.topMargin = ui.dp(12); body.addView(list, listParams);
-        grid = new GridView(this); grid.setNumColumns(GridView.AUTO_FIT); grid.setColumnWidth(ui.dp(152));
-        grid.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
-        grid.setHorizontalSpacing(ui.dp(12)); grid.setVerticalSpacing(ui.dp(12));
-        grid.setSelector(android.R.color.transparent); grid.setClipToPadding(false); grid.setAdapter(adapter);
-        list.addView(grid, new FrameLayout.LayoutParams(-1, -1));
-        empty = ui.text("Loading screens…", 20, palette.muted, false);
-        empty.setGravity(Gravity.CENTER); list.addView(empty, new FrameLayout.LayoutParams(-1, -1));
-        grid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                launch(adapter.getItem(position));
-            }
-        });
-        grid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                AppCatalog.Entry entry = adapter.getItem(position);
-                boolean added = favorites.toggle(entry.key);
-                toast(getString(added ? R.string.fav_added : R.string.fav_removed, entry.label));
-                if (tab == TAB_FAVORITES) renderBrowser(); else adapter.notifyDataSetChanged();
-                return true;
-            }
-        });
-        renderBrowser();
-    }
-
-    private void renderBrowser() {
-        if (grid == null) return;
-        AppCatalog catalog = AppCatalog.cached();
-        List<AppCatalog.Entry> entries = new ArrayList<>();
-        if (catalog != null) {
-            if (tab == TAB_FAVORITES) {
-                for (String key : favorites.keys()) { AppCatalog.Entry entry = catalog.find(key); if (entry != null) entries.add(entry); }
-            } else entries.addAll(tab == TAB_APPS ? catalog.apps : catalog.all);
-        }
-        adapter.setItems(entries);
-        empty.setText(catalog == null ? "Loading screens…" : tab == TAB_FAVORITES
-            ? "No favorites yet\nHold an app to add it here" : "No available screens");
-        empty.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
-        // Keep the four browser controls; rebuild item targets when the catalog or favorites change.
-        while (targets.size() > 4) targets.remove(targets.size() - 1);
-        for (int i = 0; i < entries.size(); i++) {
-            final AppCatalog.Entry entry = entries.get(i);
-            Target target = new Target(null, i, new Runnable() { @Override public void run() { launch(entry); } });
-            target.available = entry.launchable;
-            targets.add(target);
-        }
-        targets.addAll(headerTargets);
-        knobIndex = KnobFocus.next(-1, 1, enabledTargets()); applyKnob();
-    }
-
-    private Intent intent(ShortcutSpec spec) {
-        Intent intent = new Intent(spec.action);
-        if (spec.component != null) intent.setComponent(ComponentName.unflattenFromString(spec.component));
-        if (spec.launcher) intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        return intent;
-    }
-    private boolean available(ShortcutSpec spec) {
-        return preview || canStart(intent(spec));
-    }
-    private boolean canStart(Intent intent) {
-        ResolveInfo result = getPackageManager().resolveActivity(intent, 0);
-        ActivityInfo info = result == null ? null : result.activityInfo;
-        boolean permitted = info != null && (info.permission == null || getPackageManager().checkPermission(
-            info.permission, getPackageName()) == PackageManager.PERMISSION_GRANTED);
-        return ShortcutSpec.mayLaunch(info != null, info != null && info.exported,
-            info != null && info.enabled, info != null && info.applicationInfo.enabled, permitted);
-    }
-    private Runnable shortcutAction(final ShortcutSpec spec) {
-        return new Runnable() { @Override public void run() { start(intent(spec), spec.title); } };
-    }
-    private void addShortcutTarget(View view, ShortcutSpec spec) {
-        ui.available(view, available(spec), spec.subtitle); addTarget(view, shortcutAction(spec));
-    }
     private void addTarget(View view, Runnable action) {
-        clickable(view, action); targets.add(new Target(view, -1, action));
+        clickable(view, action); targets.add(new Target(view, action));
     }
     private void clickable(View view, final Runnable action) {
         // TUNE has one explicit selection model. Suppress the separate native
@@ -627,86 +324,11 @@ public final class MainActivity extends Activity {
         view.setClickable(true);
         view.setOnClickListener(new View.OnClickListener() { @Override public void onClick(View v) { action.run(); } });
     }
-    private void launch(AppCatalog.Entry entry) {
-        Intent intent = new Intent(Intent.ACTION_MAIN).setComponent(entry.component);
-        AppCatalog catalog = AppCatalog.cached();
-        if (catalog != null && catalog.apps.contains(entry)) intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        start(intent, entry.label);
-    }
-    private void start(Intent intent, String title) {
-        if (!canStart(intent)) { toast(getString(R.string.cannot_open, title)); return; }
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-        try { startActivity(intent); finish(); }
-        catch (ActivityNotFoundException | SecurityException error) { toast(getString(R.string.cannot_open, title)); }
-    }
-
-    private void restartConnectionTick() {
-        main.removeCallbacks(connectionTick);
-        if (resumed && page == ScreenFlow.Page.ADVANCED) { main.post(connectionTick); }
-    }
-    private void refreshConnection() {
-        if (connectionReading) return;
-        if (preview) { connection = PreviewData.connection(); updateConnectionViews(); return; }
-        connectionReading = true;
-        final int epoch = connectionEpoch;
-        new Thread(new Runnable() {
-            @Override public void run() {
-                ConnectionSnapshot value;
-                try {
-                    WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                    if (manager == null) value = ConnectionSnapshot.unknown();
-                    else {
-                        WifiInfo info = manager.getConnectionInfo();
-                        value = ConnectionSnapshot.read(manager.isWifiEnabled(), info != null
-                            && info.getSupplicantState() == SupplicantState.COMPLETED,
-                            info == null ? null : info.getSSID(), info == null ? 0 : info.getIpAddress(),
-                            property("service.adb.tcp.port"), property("persist.adb.tcp.port"));
-                    }
-                } catch (SecurityException error) { value = ConnectionSnapshot.unknown(); }
-                final ConnectionSnapshot result = value;
-                main.post(new Runnable() { @Override public void run() {
-                    connectionReading = false;
-                    if (!isFinishing() && resumed && page == ScreenFlow.Page.ADVANCED && epoch == connectionEpoch) {
-                        connection = result; updateConnectionViews();
-                    }
-                } });
-            }
-        }, "launchpad-connection").start();
-    }
-    private String property(String name) {
-        try {
-            Process process = new ProcessBuilder("/system/bin/getprop", name).start();
-            String value;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                value = reader.readLine();
-            }
-            process.waitFor(); return value == null ? "" : value;
-        } catch (Exception error) { return ""; }
-    }
-    private void updateConnectionViews() {
-        if (page != ScreenFlow.Page.ADVANCED || statusText == null) return;
-        String status = connection.state == ConnectionSnapshot.State.CONNECTED ? "Connected"
-            : connection.state == ConnectionSnapshot.State.OFF ? "Wi-Fi off"
-            : connection.state == ConnectionSnapshot.State.DISCONNECTED ? "Disconnected" : "Unavailable";
-        statusText.setText(status); networkText.setText(connection.network);
-        ipText.setText(connection.ip); adbText.setText(connection.adb);
-        ui.background(statusDot, ui.rounded(connection.state == ConnectionSnapshot.State.CONNECTED ? 0xff1acb59 : palette.idle, 7, 0));
-        copyButton.setEnabled(connection.canCopy); copyButton.setAlpha(connection.canCopy ? 1f : 0.4f);
-        if (knobIndex >= 0 && knobIndex < targets.size() && !targets.get(knobIndex).enabled()) moveKnob(1);
-    }
-    private void copyAddress() {
-        if (!connection.canCopy) return;
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        if (clipboard != null) { clipboard.setPrimaryClip(ClipData.newPlainText("ADB address", connection.adb)); toast("ADB address copied"); }
-    }
 
     @Override public boolean dispatchKeyEvent(KeyEvent event) {
         int code = event.getKeyCode(); boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
         if (code == KEY_TUNE_UP || code == KEY_TUNE_DOWN || code == KeyEvent.KEYCODE_DPAD_RIGHT || code == KeyEvent.KEYCODE_DPAD_LEFT) {
-            if (down) {
-                moveKnob(code == KEY_TUNE_UP || code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1);
-                knobOnToggle = page == ScreenFlow.Page.PRECONDITIONING && knobIndex == 0;
-            }
+            if (down) moveKnob(code == KEY_TUNE_UP || code == KeyEvent.KEYCODE_DPAD_RIGHT ? 1 : -1);
             return true;
         }
         if (code == KEY_TUNE_ENTER || code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER) {
@@ -728,28 +350,16 @@ public final class MainActivity extends Activity {
     }
     private void moveKnob(int delta) { knobIndex = KnobFocus.next(knobIndex, delta, enabledTargets()); applyKnob(); }
     private void applyKnob() {
-        int selectedGridPosition = -1;
         for (int i = 0; i < targets.size(); i++) {
             Target target = targets.get(i);
-            if (target.view != null) {
-                target.view.setActivated(i == knobIndex);
-                target.view.setSelected(i == knobIndex);
-            }
-            else if (i == knobIndex) selectedGridPosition = target.gridPosition;
-        }
-        adapter.setKnobPosition(selectedGridPosition);
-        if (grid != null && selectedGridPosition >= 0) grid.smoothScrollToPosition(selectedGridPosition);
-        if (advancedScroll != null && knobIndex >= 0 && knobIndex < targets.size()) {
-            View selected = targets.get(knobIndex).view;
-            if (selected != null) selected.requestRectangleOnScreen(
-                new android.graphics.Rect(0, 0, selected.getWidth(), selected.getHeight()), false);
+            target.view.setActivated(i == knobIndex);
+            target.view.setSelected(i == knobIndex);
         }
     }
     private void activateKnob() {
         if (knobIndex < 0) moveKnob(1);
         else if (knobIndex < targets.size() && targets.get(knobIndex).enabled()) targets.get(knobIndex).action.run();
     }
-    private void toast(String message) { Toast.makeText(this, message, Toast.LENGTH_SHORT).show(); }
     private static int keyCode(String name, int fallback) {
         int code = KeyEvent.keyCodeFromString(name); return code > 0 ? code : fallback;
     }
