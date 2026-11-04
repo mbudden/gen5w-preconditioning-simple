@@ -18,7 +18,7 @@ these steps need ADB over Wi-Fi. in my testing, an iPhone hotspot is too modern 
 
 2. **Open the hidden Wi-Fi settings.**
 
-   Enabling wireless features may not add a Wi-Fi button to Hyundai’s normal settings. You can open Android’s existing Wi-Fi screen with a small USB script. If Launchpad is already installed, its **Advanced** screen has a Wi-Fi settings button instead.
+   Enabling wireless features may not add a Wi-Fi button to Hyundai’s normal settings. You can open Android’s existing Wi-Fi screen with a small USB script.
 
    Back up the previous `NEMESIS.data` from your USB drive to your computer. Create these two plain-text files at the root of the drive, using the exact filenames below.
 

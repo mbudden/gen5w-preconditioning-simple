@@ -6,18 +6,11 @@
     android:background="@color/bg"
     android:paddingLeft="32dp"
     android:paddingRight="64dp"
-    android:paddingTop="8dp"
+    android:paddingTop="24dp"
     android:paddingBottom="24dp">
-    <LinearLayout
-        android:id="@+id/focus_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center"
-        android:orientation="horizontal" />
     <FrameLayout
         android:id="@+id/focus_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="16dp" />
+        android:layout_weight="1" />
 </LinearLayout>
